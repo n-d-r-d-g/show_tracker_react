@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import showStore from '../../store/show';
 import logo from '../../logo.svg';
+import ShowList from './components/ShowList';
 
 function Home() {
   const { t } = useTranslation(['common', 'home']);
@@ -62,9 +63,7 @@ function Home() {
       <button onClick={() => showStore.deleteShow(+index)}>
         Delete show by index
       </button>
-      <pre style={{ textAlign: 'left' }}>
-        {JSON.stringify(showStore.shows, null, 2)}
-      </pre>
+      <ShowList shows={showStore.shows} />
     </header>
   );
 }

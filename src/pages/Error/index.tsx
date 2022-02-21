@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export default function Error() {
+function Error() {
   return (
     <>
       <h1>Oops you got yourself in a bit of a mess...</h1>
@@ -9,3 +9,5 @@ export default function Error() {
     </>
   );
 }
+
+export default Error;

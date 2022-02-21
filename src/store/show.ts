@@ -1,9 +1,12 @@
 import { makeAutoObservable } from 'mobx';
 
 export interface IShow {
-  id: string;
+  id?: string;
   title: string;
   url: string;
+  imgUrl?: string;
+  season?: number;
+  episode?: number;
 }
 
 class ShowStore {
@@ -18,10 +21,11 @@ class ShowStore {
   }
 
   deleteShow(index: number) {
-    this.shows.splice(index, 1);
+    this.shows = this.shows.filter((_, i) => i !== index);
   }
 }
 
 const showStore = new ShowStore();
 
 export default showStore;
+//https://picsum.photos/32/32?random=1
