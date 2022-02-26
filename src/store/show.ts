@@ -28,4 +28,3 @@ class ShowStore {
 const showStore = new ShowStore();
 
 export default showStore;
-//https://picsum.photos/32/32?random=1
