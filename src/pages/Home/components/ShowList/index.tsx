@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
 import { IShow } from '../../../../store/show';
 import ShowItem from '../ShowItem';
@@ -9,6 +9,10 @@ interface Props {
 
 function ShowList({ shows }: Props) {
   const [showsCopy, setShowsCopy] = useState([...shows]);
+
+  useEffect(() => {
+    setShowsCopy(shows);
+  }, [shows]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
