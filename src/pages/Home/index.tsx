@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { FormEvent, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../composables/useAuth';
 import showStore from '../../store/show';
-import logo from '../../logo.svg';
 import ShowList from './components/ShowList';
 
 function Home() {
   const { t } = useTranslation(['common', 'home']);
+  const { user, isSignedIn, signIn, signOut } = useAuth();
   const [show, setShow] = useState({
     id: '',
     title: '',
@@ -15,22 +16,39 @@ function Home() {
   });
   const [index, setIndex] = useState('');
 
+  const shows = useCallback(() => toJS(showStore.shows), []);
+
+  const handleSignInFormSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e?.preventDefault?.();
+      const formTarget = e.target as HTMLFormElement;
+      const username = (
+        formTarget.elements.namedItem('username') as HTMLInputElement
+      ).value;
+      const password = (
+        formTarget.elements.namedItem('password') as HTMLInputElement
+      ).value;
+
+      signIn({ username, password });
+    },
+    [signIn]
+  );
+
   return (
-    <header className="App-header">
-      <h1>{t('home:title')}</h1>
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>
-        Edit <code>src/App.tsx</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn React
-      </a>
-      <Link to="/about">Go to about</Link>
+    <>
+      {isSignedIn && user?.username && <h1>Welcome {user.username}</h1>}
+      {!isSignedIn && (
+        <form id="signin" onSubmit={handleSignInFormSubmit}>
+          <input name="username" placeholder="Username" />
+          <input name="password" type="password" placeholder="Password" />
+          <button type="submit">Login</button>
+        </form>
+      )}
+      {isSignedIn && (
+        <button type="button" onClick={signOut} disabled={!user}>
+          Logout
+        </button>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -63,8 +81,8 @@ function Home() {
       <button onClick={() => showStore.deleteShow(+index)}>
         Delete show by index
       </button>
-      <ShowList shows={showStore.shows} />
-    </header>
+      <ShowList shows={shows()} />
+    </>
   );
 }
 
