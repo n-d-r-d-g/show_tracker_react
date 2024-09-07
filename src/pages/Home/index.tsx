@@ -1,20 +1,49 @@
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../../composables/useAuth';
-import showStore from '../../store/show';
+import showStore, { IShow } from '../../store/show';
+import { IApiShow } from '../../types/auth';
 import ShowList from './components/ShowList';
 
 function Home() {
   const { t } = useTranslation(['common', 'home']);
   const { user, isSignedIn, signIn, signOut } = useAuth();
-  const [show, setShow] = useState({
-    id: '',
+  const [show, setShow] = useState<IShow>({
     title: '',
     url: '',
+    season: 1,
+    episode: 1,
   });
-  const [index, setIndex] = useState('');
+
+  useEffect(() => {
+    const accessToken = Cookies.get('auth-access-token');
+
+    if (!accessToken) return;
+
+    axios
+      .get(`${process.env.REACT_APP_API_URL}shows`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((r) => {
+        const newShows = r.data.map((show: IApiShow) => ({
+          id: show.id,
+          title: show.name,
+          url: show.url,
+          imgUrl: show.image,
+          season: show.season,
+          episode: show.episode,
+        }));
+
+        showStore.setShows(newShows);
+      });
+  }, [user]);
 
   const shows = useCallback(() => toJS(showStore.shows), []);
 
@@ -45,22 +74,53 @@ function Home() {
         </form>
       )}
       {isSignedIn && (
-        <button type="button" onClick={signOut} disabled={!user}>
+        <button
+          type="button"
+          onClick={() => {
+            signOut();
+            showStore.setShows([]);
+          }}
+          disabled={!user}
+        >
           Logout
         </button>
       )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          showStore.addShow(show);
-          setShow({ id: '', title: '', url: '' });
+
+          const showId = uuidv4();
+
+          showStore.addShow({
+            ...show,
+            id: showId,
+          });
+
+          axios.post(
+            `${process.env.REACT_APP_API_URL}shows`,
+            {
+              id: showId,
+              name: show.title,
+              url: show.url,
+              season: show.season,
+              episode: show.episode,
+              image: show.imgUrl,
+            } as IApiShow,
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
+              },
+            }
+          );
+          setShow({
+            id: '',
+            title: '',
+            url: '',
+            season: 1,
+            episode: 1,
+          });
         }}
       >
-        <input
-          placeholder="Id"
-          value={show.id}
-          onChange={(e) => setShow((prev) => ({ ...prev, id: e.target.value }))}
-        />
         <input
           placeholder="Title"
           value={show.title}
@@ -75,12 +135,8 @@ function Home() {
             setShow((prev) => ({ ...prev, url: e.target.value }))
           }
         />
-        <button>Add show</button>
+        <button type="submit">Add show</button>
       </form>
-      <input placeholder="Index" onChange={(e) => setIndex(e.target.value)} />
-      <button onClick={() => showStore.deleteShow(+index)}>
-        Delete show by index
-      </button>
       <ShowList shows={shows()} />
     </>
   );

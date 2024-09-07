@@ -28,7 +28,7 @@ export interface TAuthContext {
   isSignedIn: boolean;
   setUser: Dispatch<SetStateAction<User | null>>;
   signIn: (requestBody: unknown) => void;
-  signOut: (requestBody: unknown) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<TAuthContext | undefined>(undefined);

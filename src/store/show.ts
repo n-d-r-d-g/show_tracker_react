@@ -20,8 +20,19 @@ class ShowStore {
     this.shows.push(show);
   }
 
-  deleteShow(index: number) {
-    this.shows = this.shows.filter((_, i) => i !== index);
+  updateShow(index: number, show: Partial<IShow>) {
+    this.shows[index] = {
+      ...this.shows[index],
+      ...show,
+    };
+  }
+
+  deleteShow(id: string) {
+    this.shows = this.shows.filter((show) => show.id !== id);
+  }
+
+  setShows(shows: Array<IShow>) {
+    this.shows = shows;
   }
 }
 
