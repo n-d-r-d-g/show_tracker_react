@@ -1,12 +1,28 @@
 import axios from 'axios';
-import showStore, { IShow } from '../../../../store/show';
 import Cookies from 'js-cookie';
+import { useCallback } from 'react';
+import showStore, { IShow } from '../../../../store/show';
 
 interface Props {
   show: IShow;
 }
 
 function ShowItem({ show }: Props) {
+  const sanitizedURL = useCallback(() => {
+    let sanitizedShowURL = show.url ?? '';
+
+    sanitizedShowURL = sanitizedShowURL.replaceAll(
+      '{season}',
+      String(show.season)
+    );
+    sanitizedShowURL = sanitizedShowURL.replaceAll(
+      '{episode}',
+      String(show.episode)
+    );
+
+    return sanitizedShowURL;
+  }, [show.episode, show.season, show.url]);
+
   return (
     <div
       style={{
@@ -26,7 +42,7 @@ function ShowItem({ show }: Props) {
       <input
         name="title"
         defaultValue={show.title}
-        onChange={(e) =>
+        onBlur={(e) =>
           axios.patch(
             `${process.env.REACT_APP_API_URL}shows/${show.id}`,
             {
@@ -40,9 +56,23 @@ function ShowItem({ show }: Props) {
           )
         }
       />
-      <button type="button" onClick={() => alert(show.url)}>
-        L
-      </button>
+      <input
+        name="url"
+        defaultValue={show.url}
+        onBlur={(e) =>
+          axios.patch(
+            `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+            {
+              url: e.target.value,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
+              },
+            }
+          )
+        }
+      />
       <div>
         <small>S: </small>
         <input
@@ -51,7 +81,7 @@ function ShowItem({ show }: Props) {
           defaultValue={show.season}
           min={0}
           max={99}
-          onChange={(e) =>
+          onBlur={(e) =>
             axios.patch(
               `${process.env.REACT_APP_API_URL}shows/${show.id}`,
               {
@@ -74,7 +104,7 @@ function ShowItem({ show }: Props) {
           defaultValue={show.episode}
           min={0}
           max={99}
-          onChange={(e) =>
+          onBlur={(e) =>
             axios.patch(
               `${process.env.REACT_APP_API_URL}shows/${show.id}`,
               {
@@ -89,7 +119,7 @@ function ShowItem({ show }: Props) {
           }
         />
       </div>
-      <a href={show.url} target="_blank" rel="noreferrer">
+      <a href={sanitizedURL()} target="_blank" rel="noreferrer">
         Watch now
       </a>
       <button
