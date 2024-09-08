@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 
 export interface IShow {
   id?: string;
+  order: number;
   title: string;
   url: string;
   imgUrl?: string;
@@ -20,11 +21,19 @@ class ShowStore {
     this.shows.push(show);
   }
 
-  updateShow(index: number, show: Partial<IShow>) {
+  updateShowByIndex(index: number, show: Partial<IShow>) {
     this.shows[index] = {
       ...this.shows[index],
       ...show,
     };
+  }
+
+  updateShowById(id: string, show: Partial<IShow>) {
+    const showIndex = this.shows.findIndex((show) => show.id === id);
+
+    if (showIndex < 0) return;
+
+    this.updateShowByIndex(showIndex, show);
   }
 
   deleteShow(id: string) {

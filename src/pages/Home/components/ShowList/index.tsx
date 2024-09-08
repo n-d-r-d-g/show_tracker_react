@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useCallback, useEffect, useState } from 'react';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
-import { IShow } from '../../../../store/show';
+import showStore, { IShow } from '../../../../store/show';
 import ShowItem from '../ShowItem';
 
 interface Props {
@@ -14,18 +16,47 @@ function ShowList({ shows }: Props) {
     setShowsCopy(shows);
   }, [shows]);
 
+  const handleSort = useCallback((newList: Array<ItemInterface>) => {
+    if (newList.length > 0) {
+      const reOrderedList = (newList as Array<IShow>).map((show, i) => {
+        const order = i + 1;
+
+        axios.patch(
+          `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+          {
+            order,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
+            },
+          }
+        );
+
+        return {
+          ...show,
+          order,
+        };
+      });
+
+      showStore.setShows(reOrderedList);
+
+      setShowsCopy(reOrderedList as Array<IShow>);
+    }
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <ReactSortable
-        list={showsCopy as ItemInterface[]}
-        setList={(newList) => setShowsCopy(newList as IShow[])}
+        list={showsCopy as Array<ItemInterface>}
+        setList={handleSort}
         style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
       >
         {showsCopy.map((show) => (
           <ShowItem key={show.id} show={show} />
         ))}
       </ReactSortable>
-      <ShowItem show={{ title: '', url: '' }} />
+      <ShowItem show={{ order: -1, title: '', url: '' }} />
     </div>
   );
 }

@@ -14,6 +14,7 @@ function Home() {
   const { t } = useTranslation(['common', 'home']);
   const { user, isSignedIn, signIn, signOut } = useAuth();
   const [show, setShow] = useState<IShow>({
+    order: -1,
     title: '',
     url: '',
     season: 1,
@@ -32,8 +33,9 @@ function Home() {
         },
       })
       .then((r) => {
-        const newShows = r.data.map((show: IApiShow) => ({
+        const newShows: Array<IShow> = r.data.map((show: IApiShow) => ({
           id: show.id,
+          order: show.order,
           title: show.name,
           url: show.url,
           imgUrl: show.image,
@@ -90,10 +92,12 @@ function Home() {
           e.preventDefault();
 
           const showId = uuidv4();
+          const showOrder = showStore.shows.length;
 
           showStore.addShow({
             ...show,
             id: showId,
+            order: showOrder,
           });
 
           axios.post(
@@ -112,8 +116,10 @@ function Home() {
               },
             }
           );
+
           setShow({
             id: '',
+            order: -1,
             title: '',
             url: '',
             season: 1,

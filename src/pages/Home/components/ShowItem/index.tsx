@@ -42,7 +42,9 @@ function ShowItem({ show }: Props) {
       <input
         name="title"
         defaultValue={show.title}
-        onBlur={(e) =>
+        onBlur={(e) => {
+          showStore.updateShowById(show.id!, { title: e.target.value });
+
           axios.patch(
             `${process.env.REACT_APP_API_URL}shows/${show.id}`,
             {
@@ -53,13 +55,17 @@ function ShowItem({ show }: Props) {
                 Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
               },
             }
-          )
-        }
+          );
+        }}
       />
       <input
         name="url"
         defaultValue={show.url}
-        onBlur={(e) =>
+        onBlur={(e) => {
+          showStore.updateShowById(show.id!, {
+            url: e.target.value,
+          });
+
           axios.patch(
             `${process.env.REACT_APP_API_URL}shows/${show.id}`,
             {
@@ -70,8 +76,8 @@ function ShowItem({ show }: Props) {
                 Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
               },
             }
-          )
-        }
+          );
+        }}
       />
       <div>
         <small>S: </small>
@@ -81,7 +87,11 @@ function ShowItem({ show }: Props) {
           defaultValue={show.season}
           min={0}
           max={99}
-          onBlur={(e) =>
+          onBlur={(e) => {
+            showStore.updateShowById(show.id!, {
+              season: +e.target.value,
+            });
+
             axios.patch(
               `${process.env.REACT_APP_API_URL}shows/${show.id}`,
               {
@@ -92,8 +102,8 @@ function ShowItem({ show }: Props) {
                   Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
                 },
               }
-            )
-          }
+            );
+          }}
         />
       </div>
       <div>
@@ -104,7 +114,11 @@ function ShowItem({ show }: Props) {
           defaultValue={show.episode}
           min={0}
           max={99}
-          onBlur={(e) =>
+          onBlur={(e) => {
+            showStore.updateShowById(show.id!, {
+              episode: +e.target.value,
+            });
+
             axios.patch(
               `${process.env.REACT_APP_API_URL}shows/${show.id}`,
               {
@@ -115,8 +129,8 @@ function ShowItem({ show }: Props) {
                   Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
                 },
               }
-            )
-          }
+            );
+          }}
         />
       </div>
       <a href={sanitizedURL()} target="_blank" rel="noreferrer">
@@ -129,6 +143,7 @@ function ShowItem({ show }: Props) {
               Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
             },
           });
+
           showStore.deleteShow(show.id!);
         }}
       >
