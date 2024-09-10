@@ -9,7 +9,7 @@ import showStore, { IShow } from '../../store/show';
 import { IApiShow } from '../../@types/auth';
 import ShowList from './components/ShowList';
 
-function Home() {
+function Shows() {
   const { user, isSignedIn, signIn, signOut } = useAuth();
   const [show, setShow] = useState<IShow>({
     order: -1,
@@ -146,4 +146,4 @@ function Home() {
   );
 }
 
-export default observer(Home);
+export default observer(Shows);

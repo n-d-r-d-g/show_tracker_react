@@ -2,24 +2,15 @@ import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
-import { ErrorPage, HomePage, SignInPage } from './pages';
+import { ErrorPage, ShowsPage, SignInPage } from './pages';
 import './App.css';
 
 function AppRoutes() {
   const { isSignedIn } = useAuth();
 
-  if (isSignedIn) {
-    return (
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-    );
-  }
-
   return (
     <Routes>
-      <Route path="/" element={<SignInPage />} />
+      <Route path="/" element={isSignedIn ? <ShowsPage /> : <SignInPage />} />
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
