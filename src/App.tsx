@@ -23,7 +23,9 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={tCommon('loading')}>
         <AuthProvider
-          signInEndpoint={`${import.meta.env.VITE_APP_API_URL}signin`}
+          signInEndpoint={`${import.meta.env.VITE_APP_API_URL}${
+            import.meta.env.VITE_SIGN_IN_ENDPOINT
+          }`}
           signOutEndpoint={`${import.meta.env.VITE_APP_API_URL}signout`}
         >
           <AppRoutes />

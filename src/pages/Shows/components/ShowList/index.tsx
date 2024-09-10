@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { useCallback, useEffect, useState } from 'react';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
 import showStore, { IShow } from '../../../../store/show';
@@ -21,17 +20,9 @@ function ShowList({ shows }: Props) {
       const reOrderedList = (newList as Array<IShow>).map((show, i) => {
         const order = i + 1;
 
-        axios.patch(
-          `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
-          {
-            order,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-            },
-          }
-        );
+        axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+          order,
+        });
 
         return {
           ...show,

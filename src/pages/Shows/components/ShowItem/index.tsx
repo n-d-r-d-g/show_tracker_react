@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { useCallback } from 'react';
 import showStore, { IShow } from '../../../../store/show';
 
@@ -45,17 +44,9 @@ function ShowItem({ show }: Props) {
         onBlur={(e) => {
           showStore.updateShowById(show.id!, { title: e.target.value });
 
-          axios.patch(
-            `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
-            {
-              name: e.target.value,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-              },
-            }
-          );
+          axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+            name: e.target.value,
+          });
         }}
       />
       <input
@@ -66,17 +57,9 @@ function ShowItem({ show }: Props) {
             url: e.target.value,
           });
 
-          axios.patch(
-            `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
-            {
-              url: e.target.value,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-              },
-            }
-          );
+          axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+            url: e.target.value,
+          });
         }}
       />
       <div>
@@ -92,17 +75,9 @@ function ShowItem({ show }: Props) {
               season: +e.target.value,
             });
 
-            axios.patch(
-              `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
-              {
-                season: +e.target.value,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-                },
-              }
-            );
+            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+              season: +e.target.value,
+            });
           }}
         />
       </div>
@@ -119,17 +94,9 @@ function ShowItem({ show }: Props) {
               episode: +e.target.value,
             });
 
-            axios.patch(
-              `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
-              {
-                episode: +e.target.value,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-                },
-              }
-            );
+            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+              episode: +e.target.value,
+            });
           }}
         />
       </div>
@@ -138,11 +105,7 @@ function ShowItem({ show }: Props) {
       </a>
       <button
         onClick={() => {
-          axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-            },
-          });
+          axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
 
           showStore.deleteShow(show.id!);
         }}

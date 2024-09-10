@@ -20,29 +20,23 @@ function Shows() {
   });
 
   useEffect(() => {
-    const accessToken = Cookies.get('auth-access-token');
+    const accessToken = Cookies.get(import.meta.env.VITE_ACCESS_TOKEN_COOKIE);
 
     if (!accessToken) return;
 
-    axios
-      .get(`${import.meta.env.VITE_APP_API_URL}shows`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((r) => {
-        const newShows: Array<IShow> = r.data.map((show: IApiShow) => ({
-          id: show.id,
-          order: show.order,
-          title: show.name,
-          url: show.url,
-          imgUrl: show.image,
-          season: show.season,
-          episode: show.episode,
-        }));
+    axios.get(`${import.meta.env.VITE_APP_API_URL}shows`).then((r) => {
+      const newShows: Array<IShow> = r.data.map((show: IApiShow) => ({
+        id: show.id,
+        order: show.order,
+        title: show.name,
+        url: show.url,
+        imgUrl: show.image,
+        season: show.season,
+        episode: show.episode,
+      }));
 
-        showStore.setShows(newShows);
-      });
+      showStore.setShows(newShows);
+    });
   }, [user]);
 
   const shows = useCallback(() => toJS(showStore.shows), []);
@@ -98,22 +92,14 @@ function Shows() {
             order: showOrder,
           });
 
-          axios.post(
-            `${import.meta.env.VITE_APP_API_URL}shows`,
-            {
-              id: showId,
-              name: show.title,
-              url: show.url,
-              season: show.season,
-              episode: show.episode,
-              image: show.imgUrl,
-            } as IApiShow,
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
-              },
-            }
-          );
+          axios.post(`${import.meta.env.VITE_APP_API_URL}shows`, {
+            id: showId,
+            name: show.title,
+            url: show.url,
+            season: show.season,
+            episode: show.episode,
+            image: show.imgUrl,
+          } as IApiShow);
 
           setShow({
             id: '',

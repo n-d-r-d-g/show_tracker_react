@@ -37,7 +37,7 @@ AuthContext.displayName = 'AuthContext';
 export const AuthProvider = ({
   signInEndpoint = '',
   signOutEndpoint = '',
-  cookieName = 'auth-access-token',
+  cookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE,
   accessTokenAccessor = (r: unknown) => (r as MockSignInResponse).access_token,
   expiryDateAccessor = (r: unknown) => {
     const token = (r as MockSignInResponse).access_token;
@@ -101,14 +101,8 @@ export const AuthProvider = ({
   );
 
   const signOut = useCallback(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${Cookies.get(cookieName)}`,
-      },
-    };
-
     axios
-      .get(signOutEndpoint, config)
+      .get(signOutEndpoint)
       .then(() => {
         setUser(null);
 
