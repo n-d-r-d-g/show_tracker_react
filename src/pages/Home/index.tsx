@@ -3,15 +3,13 @@ import Cookies from 'js-cookie';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
-import { useAuth } from '../../composables/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import showStore, { IShow } from '../../store/show';
-import { IApiShow } from '../../types/auth';
+import { IApiShow } from '../../@types/auth';
 import ShowList from './components/ShowList';
 
 function Home() {
-  const { t } = useTranslation(['common', 'home']);
   const { user, isSignedIn, signIn, signOut } = useAuth();
   const [show, setShow] = useState<IShow>({
     order: -1,
@@ -27,7 +25,7 @@ function Home() {
     if (!accessToken) return;
 
     axios
-      .get(`${process.env.REACT_APP_API_URL}shows`, {
+      .get(`${import.meta.env.VITE_APP_API_URL}shows`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -101,7 +99,7 @@ function Home() {
           });
 
           axios.post(
-            `${process.env.REACT_APP_API_URL}shows`,
+            `${import.meta.env.VITE_APP_API_URL}shows`,
             {
               id: showId,
               name: show.title,

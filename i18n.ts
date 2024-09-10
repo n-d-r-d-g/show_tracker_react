@@ -1,11 +1,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-
 import Backend from 'i18next-http-backend';
+
 // import LanguageDetector from 'i18next-browser-languagedetector';
 // don't want to use this?
 // have a look at the Quick start guide
 // for passing in lng and translations on init
+
+export const defaultNS = 'common';
 
 i18n
   // load translation using http -> see /public/locales (i.e. https://github.com/i18next/react-i18next/tree/master/example/react/public/locales)
@@ -20,14 +22,16 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: process.env.REACT_APP_I18N_FALLBACK_LANG,
-    debug: process.env.REACT_APP_I18N_DISPLAY_DEBUG_LOGS === 'true',
+    fallbackLng: import.meta.env.VITE_APP_I18N_FALLBACK_LANG,
+    debug: import.meta.env.VITE_APP_I18N_DISPLAY_DEBUG_LOGS === 'true',
     // backend: {
     //   loadPath: "/locales/{{lng}}/{{ns}}.json",
     //   crossDomain: true
     // },
-    ns: ['common', 'home'],
-    defaultNS: 'common',
+    lng: 'en',
+    supportedLngs: ['en'],
+    ns: ['common', 'error', 'home', 'signIn'],
+    defaultNS: defaultNS,
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },

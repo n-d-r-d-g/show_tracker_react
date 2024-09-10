@@ -46,7 +46,7 @@ function ShowItem({ show }: Props) {
           showStore.updateShowById(show.id!, { title: e.target.value });
 
           axios.patch(
-            `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+            `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
             {
               name: e.target.value,
             },
@@ -67,7 +67,7 @@ function ShowItem({ show }: Props) {
           });
 
           axios.patch(
-            `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+            `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
             {
               url: e.target.value,
             },
@@ -93,7 +93,7 @@ function ShowItem({ show }: Props) {
             });
 
             axios.patch(
-              `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+              `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
               {
                 season: +e.target.value,
               },
@@ -120,7 +120,7 @@ function ShowItem({ show }: Props) {
             });
 
             axios.patch(
-              `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+              `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
               {
                 episode: +e.target.value,
               },
@@ -138,7 +138,7 @@ function ShowItem({ show }: Props) {
       </a>
       <button
         onClick={() => {
-          axios.delete(`${process.env.REACT_APP_API_URL}shows/${show.id}`, {
+          axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
             headers: {
               Authorization: `Bearer ${Cookies.get('auth-access-token')}`,
             },

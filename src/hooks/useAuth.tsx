@@ -10,7 +10,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { MockSignInResponse, User } from '../types/auth';
+import { MockSignInResponse, User } from '../@types/auth';
 
 export interface AuthProviderProps {
   signInEndpoint: string;
@@ -72,7 +72,7 @@ export const AuthProvider = ({
   }, []);
 
   const signIn = useCallback(
-    (requestBody) => {
+    (requestBody: unknown) => {
       axios
         .post(signInEndpoint, requestBody, { headers: { framework: 'react' } })
         .then((r) => {

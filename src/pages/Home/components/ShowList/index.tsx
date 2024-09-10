@@ -22,7 +22,7 @@ function ShowList({ shows }: Props) {
         const order = i + 1;
 
         axios.patch(
-          `${process.env.REACT_APP_API_URL}shows/${show.id}`,
+          `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
           {
             order,
           },
