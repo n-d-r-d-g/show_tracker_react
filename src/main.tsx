@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './api';
 import './i18n.ts';
+import './tailwind.css';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
