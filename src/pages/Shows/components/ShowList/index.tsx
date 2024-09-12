@@ -1,55 +1,48 @@
 import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
-import { ItemInterface, ReactSortable } from 'react-sortablejs';
-import showStore, { IShow } from '../../../../store/show';
+import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
+import { ItemInterface, ReactSortable, SortableEvent } from 'react-sortablejs';
+import showStore from '../../../../store/show';
 import ShowItem from '../ShowItem';
 
-interface Props {
-  shows: IShow[];
-}
+const ShowList = observer(function () {
+  const handleDragEnd = useCallback((evt: SortableEvent) => {
+    const tmpShow = {
+      ...showStore.shows[evt.newIndex!],
+      order: showStore.shows[evt.oldIndex!].order,
+    };
+    showStore.updateShowByIndex(evt.newIndex!, {
+      ...showStore.shows[evt.oldIndex!],
+      order: showStore.shows[evt.newIndex!].order,
+    });
+    showStore.updateShowByIndex(evt.oldIndex!, tmpShow);
 
-function ShowList({ shows }: Props) {
-  const [showsCopy, setShowsCopy] = useState([...shows]);
-
-  useEffect(() => {
-    setShowsCopy(shows);
-  }, [shows]);
-
-  const handleSort = useCallback((newList: Array<ItemInterface>) => {
-    if (newList.length > 0) {
-      const reOrderedList = (newList as Array<IShow>).map((show, i) => {
-        const order = i + 1;
-
-        axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-          order,
-        });
-
-        return {
-          ...show,
-          order,
-        };
-      });
-
-      showStore.setShows(reOrderedList);
-
-      setShowsCopy(reOrderedList as Array<IShow>);
-    }
+    axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}shows/${
+        showStore.shows[evt.oldIndex!].id
+      }`,
+      { order: showStore.shows[evt.oldIndex!].order }
+    );
+    axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}shows/${
+        showStore.shows[evt.newIndex!].id
+      }`,
+      { order: showStore.shows[evt.newIndex!].order }
+    );
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <ReactSortable
-        list={showsCopy as Array<ItemInterface>}
-        setList={handleSort}
-        style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
-      >
-        {showsCopy.map((show) => (
-          <ShowItem key={show.id} show={show} />
-        ))}
-      </ReactSortable>
-      <ShowItem show={{ order: -1, title: '', url: '' }} />
-    </div>
+    <ReactSortable
+      list={showStore.shows as Array<ItemInterface>}
+      setList={() => undefined}
+      onEnd={handleDragEnd}
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+    >
+      {showStore.shows.map((show) => (
+        <ShowItem key={show.id} show={show} />
+      ))}
+    </ReactSortable>
   );
-}
+});
 
 export default ShowList;

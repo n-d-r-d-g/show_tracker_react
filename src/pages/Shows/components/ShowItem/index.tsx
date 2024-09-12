@@ -1,12 +1,19 @@
 import axios from 'axios';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import showStore, { IShow } from '../../../../store/show';
+import { DEBOUNCE_TIMEOUT_IN_MS } from '../../../../constants';
 
 interface Props {
   show: IShow;
 }
 
 function ShowItem({ show }: Props) {
+  const timeoutRef = useRef<number>();
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
+
   const sanitizedURL = useCallback(() => {
     let sanitizedShowURL = show.url ?? '';
 
@@ -41,25 +48,33 @@ function ShowItem({ show }: Props) {
       <input
         name="title"
         defaultValue={show.title}
-        onBlur={(e) => {
-          showStore.updateShowById(show.id!, { title: e.target.value });
+        onChange={(e) => {
+          clearTimeout(timeoutRef.current);
 
-          axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-            name: e.target.value,
-          });
+          timeoutRef.current = setTimeout(() => {
+            showStore.updateShowById(show.id!, { title: e.target.value });
+
+            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+              name: e.target.value,
+            });
+          }, DEBOUNCE_TIMEOUT_IN_MS);
         }}
       />
       <input
         name="url"
         defaultValue={show.url}
-        onBlur={(e) => {
-          showStore.updateShowById(show.id!, {
-            url: e.target.value,
-          });
+        onChange={(e) => {
+          clearTimeout(timeoutRef.current);
 
-          axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-            url: e.target.value,
-          });
+          timeoutRef.current = setTimeout(() => {
+            showStore.updateShowById(show.id!, {
+              url: e.target.value,
+            });
+
+            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
+              url: e.target.value,
+            });
+          }, DEBOUNCE_TIMEOUT_IN_MS);
         }}
       />
       <div>
@@ -70,14 +85,21 @@ function ShowItem({ show }: Props) {
           defaultValue={show.season}
           min={0}
           max={99}
-          onBlur={(e) => {
-            showStore.updateShowById(show.id!, {
-              season: +e.target.value,
-            });
+          onChange={(e) => {
+            clearTimeout(timeoutRef.current);
 
-            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-              season: +e.target.value,
-            });
+            timeoutRef.current = setTimeout(() => {
+              showStore.updateShowById(show.id!, {
+                season: +e.target.value,
+              });
+
+              axios.patch(
+                `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
+                {
+                  season: +e.target.value,
+                }
+              );
+            }, DEBOUNCE_TIMEOUT_IN_MS);
           }}
         />
       </div>
@@ -89,14 +111,21 @@ function ShowItem({ show }: Props) {
           defaultValue={show.episode}
           min={0}
           max={99}
-          onBlur={(e) => {
-            showStore.updateShowById(show.id!, {
-              episode: +e.target.value,
-            });
+          onChange={(e) => {
+            clearTimeout(timeoutRef.current);
 
-            axios.patch(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`, {
-              episode: +e.target.value,
-            });
+            timeoutRef.current = setTimeout(() => {
+              showStore.updateShowById(show.id!, {
+                episode: +e.target.value,
+              });
+
+              axios.patch(
+                `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
+                {
+                  episode: +e.target.value,
+                }
+              );
+            }, DEBOUNCE_TIMEOUT_IN_MS);
           }}
         />
       </div>

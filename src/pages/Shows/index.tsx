@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +8,7 @@ import showStore, { IShow } from '../../store/show';
 import { IApiShow } from '../../@types/auth';
 import ShowList from './components/ShowList';
 
-function Shows() {
+const Shows = observer(function () {
   const { user, isSignedIn, signIn, signOut } = useAuth();
   const [show, setShow] = useState<IShow>({
     order: -1,
@@ -38,8 +37,6 @@ function Shows() {
       showStore.setShows(newShows);
     });
   }, [user]);
-
-  const shows = useCallback(() => toJS(showStore.shows), []);
 
   const handleSignInFormSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -127,9 +124,9 @@ function Shows() {
         />
         <button type="submit">Add show</button>
       </form>
-      <ShowList shows={shows()} />
+      <ShowList />
     </>
   );
-}
+});
 
-export default observer(Shows);
+export default Shows;
