@@ -7,6 +7,10 @@ import ShowItem from '../ShowItem';
 
 const ShowList = observer(function () {
   const handleDragEnd = useCallback((evt: SortableEvent) => {
+    const itemsSwapped = evt.oldIndex !== evt.newIndex;
+
+    if (!itemsSwapped) return;
+
     const tmpShow = {
       ...showStore.shows[evt.newIndex!],
       order: showStore.shows[evt.oldIndex!].order,
@@ -23,6 +27,7 @@ const ShowList = observer(function () {
       }`,
       { order: showStore.shows[evt.oldIndex!].order }
     );
+
     axios.patch(
       `${import.meta.env.VITE_APP_API_URL}shows/${
         showStore.shows[evt.newIndex!].id
