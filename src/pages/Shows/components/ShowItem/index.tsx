@@ -30,15 +30,7 @@ function ShowItem({ show }: Props) {
   }, [show.episode, show.season, show.url]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: '0.5rem',
-        opacity: show.id ? 1 : 0.5,
-      }}
-    >
+    <div className="flex flex-row items-center gap-2">
       <img
         src={show.imgUrl || './logo192.png'}
         alt={`${show.title} cover`}

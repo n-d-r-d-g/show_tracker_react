@@ -36,7 +36,7 @@ const ShowList = observer(function () {
       list={showStore.shows as Array<ItemInterface>}
       setList={() => undefined}
       onEnd={handleDragEnd}
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+      className="flex flex-col gap-2"
     >
       {showStore.shows.map((show) => (
         <ShowItem key={show.id} show={show} />
