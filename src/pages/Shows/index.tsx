@@ -19,12 +19,14 @@ const Shows = observer(function () {
   });
 
   useEffect(() => {
-    const accessToken = Cookies.get(import.meta.env.VITE_ACCESS_TOKEN_COOKIE);
+    const accessToken = Cookies.get(
+      import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string
+    );
 
     if (!accessToken) return;
 
     axios.get(`${import.meta.env.VITE_APP_API_URL}shows`).then((r) => {
-      const newShows: Array<IShow> = r.data.map((show: IApiShow) => ({
+      const newShows = (r.data as Array<IApiShow>).map((show) => ({
         id: show.id,
         order: show.order,
         title: show.name,
@@ -32,7 +34,7 @@ const Shows = observer(function () {
         imgUrl: show.image,
         season: show.season,
         episode: show.episode,
-      }));
+      })) as Array<IShow>;
 
       showStore.setShows(newShows);
     });

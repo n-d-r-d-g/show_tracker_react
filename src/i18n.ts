@@ -22,7 +22,7 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: import.meta.env.VITE_APP_I18N_FALLBACK_LANG,
+    fallbackLng: import.meta.env.VITE_APP_I18N_FALLBACK_LANG as string,
     debug: import.meta.env.VITE_APP_I18N_DISPLAY_DEBUG_LOGS === 'true',
     // backend: {
     //   loadPath: "/locales/{{lng}}/{{ns}}.json",

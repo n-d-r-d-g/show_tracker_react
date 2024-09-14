@@ -10,7 +10,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { MockSignInResponse, User } from '../@types/auth';
+import { MockSignInResponse, Payload, User } from '../@types/auth';
 
 export interface AuthProviderProps {
   signInEndpoint: string;
@@ -37,13 +37,13 @@ AuthContext.displayName = 'AuthContext';
 export const AuthProvider = ({
   signInEndpoint = '',
   signOutEndpoint = '',
-  cookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE,
+  cookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
   accessTokenAccessor = (r: unknown) => (r as MockSignInResponse).access_token,
   expiryDateAccessor = (r: unknown) => {
     const token = (r as MockSignInResponse).access_token;
     const parts = token.split('.');
     const strPayload = parts[1];
-    const payload = JSON.parse(atob(strPayload));
+    const payload = JSON.parse(atob(strPayload)) as Payload;
     const expiryDate = payload.exp * 1000;
     const expiry = Math.round(
       (expiryDate - Date.now()) / (24 * 60 * 60 * 1000)
@@ -52,7 +52,7 @@ export const AuthProvider = ({
     return expiry;
   },
   userAccessor = (token: string) => ({
-    username: JSON.parse(atob(token.split('.')[1]))?.username,
+    username: (JSON.parse(atob(token.split('.')[1])) as User)?.username,
   }),
   children,
 }: AuthProviderProps) => {
@@ -131,4 +131,4 @@ export const AuthProvider = ({
   );
 };
 
-export const useAuth = () => useContext(AuthContext) as TAuthContext;
+export const useAuth = () => useContext(AuthContext)!;

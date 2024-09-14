@@ -32,7 +32,7 @@ function ShowItem({ show }: Props) {
   return (
     <div className="flex flex-row items-center gap-2">
       <img
-        src={show.imgUrl || './logo192.png'}
+        src={show.imgUrl ?? './logo192.png'}
         alt={`${show.title} cover`}
         width="24px"
         height="24px"

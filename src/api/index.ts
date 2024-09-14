@@ -11,11 +11,11 @@ axios.interceptors.request.use(
 
     if (isAuthorizationRequired) {
       config.headers.Authorization = `Bearer ${Cookies.get(
-        import.meta.env.VITE_ACCESS_TOKEN_COOKIE
+        import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string
       )}`;
     }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error as Error)
 );
