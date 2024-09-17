@@ -28,6 +28,7 @@ function App() {
           }`}
           signOutEndpoint={`${import.meta.env.VITE_APP_API_URL}signout`}
           signOutAllEndpoint={`${import.meta.env.VITE_APP_API_URL}signout/all`}
+          refreshEndpoint={`${import.meta.env.VITE_APP_API_URL}refresh`}
         >
           <AppRoutes />
         </AuthProvider>

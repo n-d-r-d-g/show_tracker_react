@@ -10,12 +10,15 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { MockSignInResponse, Payload, User } from '../@types/auth';
+import { MockSignInResponse, User } from '../@types/auth';
+import { validateTokens } from '../api';
+import { tokenExpiryDateAccessor } from '../functions';
 
 export interface AuthProviderProps {
   signInEndpoint: string;
   signOutEndpoint: string;
   signOutAllEndpoint?: string;
+  refreshEndpoint?: string;
   accessTokenCookieName?: string;
   refreshTokenCookieName?: string;
   accessTokenAccessor?: (r: unknown) => string;
@@ -42,20 +45,12 @@ export const AuthProvider = ({
   signInEndpoint = '',
   signOutEndpoint = '',
   signOutAllEndpoint = '',
+  refreshEndpoint = '',
   accessTokenCookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
   refreshTokenCookieName = import.meta.env.VITE_REFRESH_TOKEN_COOKIE as string,
   accessTokenAccessor = (r: unknown) => (r as MockSignInResponse).access_token,
   refreshTokenAccessor = (r: unknown) =>
     (r as MockSignInResponse).refresh_token,
-  expiryDateAccessor = (jwtToken: string) => {
-    const parts = jwtToken.split('.');
-    const strPayload = parts[1];
-    const payload = JSON.parse(atob(strPayload)) as Payload;
-    const expiryDate = payload.exp * 1000;
-    const expiry = (expiryDate - Date.now()) / (24 * 60 * 60 * 1000);
-
-    return expiry;
-  },
   userAccessor = (accessToken: string) => ({
     username: (JSON.parse(atob(accessToken.split('.')[1])) as User)?.username,
   }),
@@ -63,7 +58,17 @@ export const AuthProvider = ({
 }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  const onInit = useCallback(async () => {
+    try {
+      await validateTokens(
+        accessTokenCookieName,
+        refreshTokenCookieName,
+        refreshEndpoint
+      );
+    } catch {
+      return;
+    }
+
     const accessToken = Cookies.get(accessTokenCookieName);
 
     if (!accessToken) return;
@@ -73,6 +78,15 @@ export const AuthProvider = ({
     if (!newUser) return;
 
     setUser(newUser);
+  }, [
+    accessTokenCookieName,
+    refreshEndpoint,
+    refreshTokenCookieName,
+    userAccessor,
+  ]);
+
+  useEffect(() => {
+    onInit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -83,10 +97,10 @@ export const AuthProvider = ({
         .then((r) => {
           const accessToken = accessTokenAccessor(r.data);
           const refreshToken = refreshTokenAccessor(r.data);
-          const accessTokenExpires = expiryDateAccessor(
+          const accessTokenExpires = tokenExpiryDateAccessor(
             (r.data as MockSignInResponse).access_token
           );
-          const refreshTokenExpires = expiryDateAccessor(
+          const refreshTokenExpires = tokenExpiryDateAccessor(
             (r.data as MockSignInResponse).refresh_token
           );
           const accessTokenCookieOpts: Cookies.CookieAttributes = {
@@ -120,7 +134,6 @@ export const AuthProvider = ({
     [
       accessTokenAccessor,
       accessTokenCookieName,
-      expiryDateAccessor,
       refreshTokenAccessor,
       refreshTokenCookieName,
       signInEndpoint,
@@ -160,7 +173,7 @@ export const AuthProvider = ({
         Cookies.remove(refreshTokenCookieName, opts);
       })
       .catch((e) => console.log('e :>> ', e));
-  }, [accessTokenCookieName, refreshTokenCookieName]);
+  }, [accessTokenCookieName, refreshTokenCookieName, signOutAllEndpoint]);
 
   return (
     <AuthContext.Provider

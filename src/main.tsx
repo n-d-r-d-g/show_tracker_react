@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import './api';
+import './api/axios.ts';
 import './i18n.ts';
 import './tailwind.css';
 import './index.css';
