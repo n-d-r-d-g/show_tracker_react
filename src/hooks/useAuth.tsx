@@ -15,9 +15,11 @@ import { MockSignInResponse, Payload, User } from '../@types/auth';
 export interface AuthProviderProps {
   signInEndpoint: string;
   signOutEndpoint: string;
-  cookieName?: string;
+  accessTokenCookieName?: string;
+  refreshTokenCookieName?: string;
   accessTokenAccessor?: (r: unknown) => string;
-  expiryDateAccessor?: (r: unknown) => number;
+  refreshTokenAccessor?: (r: unknown) => string;
+  expiryDateAccessor?: (t: string) => number;
   onSignInSuccess?: (r: unknown) => undefined;
   userAccessor?: (t: string) => User;
   children: ReactElement;
@@ -37,33 +39,33 @@ AuthContext.displayName = 'AuthContext';
 export const AuthProvider = ({
   signInEndpoint = '',
   signOutEndpoint = '',
-  cookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
+  accessTokenCookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
+  refreshTokenCookieName = import.meta.env.VITE_REFRESH_TOKEN_COOKIE as string,
   accessTokenAccessor = (r: unknown) => (r as MockSignInResponse).access_token,
-  expiryDateAccessor = (r: unknown) => {
-    const token = (r as MockSignInResponse).access_token;
-    const parts = token.split('.');
+  refreshTokenAccessor = (r: unknown) =>
+    (r as MockSignInResponse).refresh_token,
+  expiryDateAccessor = (jwtToken: string) => {
+    const parts = jwtToken.split('.');
     const strPayload = parts[1];
     const payload = JSON.parse(atob(strPayload)) as Payload;
     const expiryDate = payload.exp * 1000;
-    const expiry = Math.round(
-      (expiryDate - Date.now()) / (24 * 60 * 60 * 1000)
-    );
+    const expiry = (expiryDate - Date.now()) / (24 * 60 * 60 * 1000);
 
     return expiry;
   },
-  userAccessor = (token: string) => ({
-    username: (JSON.parse(atob(token.split('.')[1])) as User)?.username,
+  userAccessor = (accessToken: string) => ({
+    username: (JSON.parse(atob(accessToken.split('.')[1])) as User)?.username,
   }),
   children,
 }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const token = Cookies.get(cookieName);
+    const accessToken = Cookies.get(accessTokenCookieName);
 
-    if (!token) return;
+    if (!accessToken) return;
 
-    const newUser = userAccessor(token);
+    const newUser = userAccessor(accessToken);
 
     if (!newUser) return;
 
@@ -76,16 +78,37 @@ export const AuthProvider = ({
       axios
         .post(signInEndpoint, requestBody, { headers: { framework: 'react' } })
         .then((r) => {
-          const token = accessTokenAccessor(r.data);
-          const expires = expiryDateAccessor(r.data);
-          const opts: Cookies.CookieAttributes = {
-            expires,
+          const accessToken = accessTokenAccessor(r.data);
+          const refreshToken = refreshTokenAccessor(r.data);
+          const accessTokenExpires = expiryDateAccessor(
+            (r.data as MockSignInResponse).access_token
+          );
+          const refreshTokenExpires = expiryDateAccessor(
+            (r.data as MockSignInResponse).refresh_token
+          );
+          const accessTokenCookieOpts: Cookies.CookieAttributes = {
+            expires: accessTokenExpires,
+            secure: true,
+            sameSite: 'Lax',
+          };
+          const refreshTokenCookieOpts: Cookies.CookieAttributes = {
+            expires: refreshTokenExpires,
             secure: true,
             sameSite: 'Lax',
           };
 
-          setUser(userAccessor(token));
-          Cookies.set(cookieName, token, opts);
+          setUser(userAccessor(accessToken));
+
+          Cookies.set(
+            accessTokenCookieName,
+            accessToken,
+            accessTokenCookieOpts
+          );
+          Cookies.set(
+            refreshTokenCookieName,
+            refreshToken,
+            refreshTokenCookieOpts
+          );
         })
         .catch((e) => {
           console.log('e :>> ', e);
@@ -93,8 +116,10 @@ export const AuthProvider = ({
     },
     [
       accessTokenAccessor,
-      cookieName,
+      accessTokenCookieName,
       expiryDateAccessor,
+      refreshTokenAccessor,
+      refreshTokenCookieName,
       signInEndpoint,
       userAccessor,
     ]
@@ -111,10 +136,10 @@ export const AuthProvider = ({
           sameSite: 'Lax',
         };
 
-        Cookies.remove(cookieName, opts);
+        Cookies.remove(accessTokenCookieName, opts);
       })
       .catch((e) => console.log('e :>> ', e));
-  }, [cookieName, signOutEndpoint]);
+  }, [accessTokenCookieName, signOutEndpoint]);
 
   return (
     <AuthContext.Provider

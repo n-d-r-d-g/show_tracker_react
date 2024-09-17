@@ -6,6 +6,7 @@ export type SignInResponse = Record<string, unknown>;
 
 export interface MockSignInResponse {
   access_token: string;
+  refresh_token: string;
 }
 
 export interface IApiShow {
