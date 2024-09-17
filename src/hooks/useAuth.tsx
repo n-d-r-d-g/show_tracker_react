@@ -15,6 +15,7 @@ import { MockSignInResponse, Payload, User } from '../@types/auth';
 export interface AuthProviderProps {
   signInEndpoint: string;
   signOutEndpoint: string;
+  signOutAllEndpoint?: string;
   accessTokenCookieName?: string;
   refreshTokenCookieName?: string;
   accessTokenAccessor?: (r: unknown) => string;
@@ -31,6 +32,7 @@ export interface TAuthContext {
   setUser: Dispatch<SetStateAction<User | null>>;
   signIn: (requestBody: unknown) => void;
   signOut: () => void;
+  signOutAll: () => void;
 }
 
 const AuthContext = createContext<TAuthContext | undefined>(undefined);
@@ -39,6 +41,7 @@ AuthContext.displayName = 'AuthContext';
 export const AuthProvider = ({
   signInEndpoint = '',
   signOutEndpoint = '',
+  signOutAllEndpoint = '',
   accessTokenCookieName = import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
   refreshTokenCookieName = import.meta.env.VITE_REFRESH_TOKEN_COOKIE as string,
   accessTokenAccessor = (r: unknown) => (r as MockSignInResponse).access_token,
@@ -137,9 +140,27 @@ export const AuthProvider = ({
         };
 
         Cookies.remove(accessTokenCookieName, opts);
+        Cookies.remove(refreshTokenCookieName, opts);
       })
       .catch((e) => console.log('e :>> ', e));
-  }, [accessTokenCookieName, signOutEndpoint]);
+  }, [accessTokenCookieName, refreshTokenCookieName, signOutEndpoint]);
+
+  const signOutAll = useCallback(() => {
+    axios
+      .get(signOutAllEndpoint)
+      .then(() => {
+        setUser(null);
+
+        const opts: Cookies.CookieAttributes = {
+          secure: true,
+          sameSite: 'Lax',
+        };
+
+        Cookies.remove(accessTokenCookieName, opts);
+        Cookies.remove(refreshTokenCookieName, opts);
+      })
+      .catch((e) => console.log('e :>> ', e));
+  }, [accessTokenCookieName, refreshTokenCookieName]);
 
   return (
     <AuthContext.Provider
@@ -149,6 +170,7 @@ export const AuthProvider = ({
         setUser,
         signIn,
         signOut,
+        signOutAll,
       }}
     >
       {children}

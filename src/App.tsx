@@ -27,6 +27,7 @@ function App() {
             import.meta.env.VITE_SIGN_IN_ENDPOINT
           }`}
           signOutEndpoint={`${import.meta.env.VITE_APP_API_URL}signout`}
+          signOutAllEndpoint={`${import.meta.env.VITE_APP_API_URL}signout/all`}
         >
           <AppRoutes />
         </AuthProvider>

@@ -9,7 +9,7 @@ import showStore, { IShow } from '../../store/show';
 import ShowList from './components/ShowList';
 
 const Shows = observer(function () {
-  const { user, signOut } = useAuth();
+  const { user, signOut, signOutAll } = useAuth();
   const [show, setShow] = useState<IShow>({
     order: -1,
     title: '',
@@ -44,6 +44,11 @@ const Shows = observer(function () {
     signOut();
     showStore.setShows([]);
   }, [signOut]);
+
+  const handleSignOutAll = useCallback(() => {
+    signOutAll();
+    showStore.setShows([]);
+  }, [signOutAll]);
 
   const handleAddShow = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -84,6 +89,9 @@ const Shows = observer(function () {
       {user?.username && <h1>Welcome {user.username}</h1>}
       <button type="button" onClick={handleSignOut} disabled={!user}>
         Log out
+      </button>
+      <button type="button" onClick={handleSignOutAll} disabled={!user}>
+        Log out on all devices
       </button>
       <form
         onSubmit={handleAddShow}
