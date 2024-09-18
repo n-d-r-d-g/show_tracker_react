@@ -25,7 +25,10 @@ export async function validateTokens(
   if (!isTokenValid(refreshToken)) throw new Error('User needs to log in!');
 
   const resp = await axios.get(refreshEndpoint, {
-    headers: { Authorization: `Bearer ${refreshToken}` },
+    headers: {
+      Authorization: `Bearer ${refreshToken}`,
+      framework: import.meta.env.VITE_APP_FRAMEWORK as string,
+    },
   });
 
   const { access_token: newAccessToken, refresh_token: newRefreshToken } =
