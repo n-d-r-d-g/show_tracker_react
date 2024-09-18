@@ -8,6 +8,9 @@ axios.interceptors.request.use(
       `${import.meta.env.VITE_APP_API_URL}${
         import.meta.env.VITE_SIGN_IN_ENDPOINT
       }`,
+      `${import.meta.env.VITE_APP_API_URL}${
+        import.meta.env.VITE_REFRESH_ENDPOINT
+      }`,
     ].includes(config.url!);
 
     if (isAuthorizationRequired) {
@@ -15,7 +18,9 @@ axios.interceptors.request.use(
         await validateTokens(
           import.meta.env.VITE_ACCESS_TOKEN_COOKIE as string,
           import.meta.env.VITE_REFRESH_TOKEN_COOKIE as string,
-          `${import.meta.env.VITE_APP_API_URL}refresh`
+          `${import.meta.env.VITE_APP_API_URL}${
+            import.meta.env.VITE_REFRESH_ENDPOINT
+          }`
         );
       } catch (e) {
         Promise.reject(e as Error);
