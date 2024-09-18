@@ -8,6 +8,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { MockSignInResponse, User } from '../@types/auth';
@@ -57,8 +58,13 @@ export const AuthProvider = ({
   children,
 }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const isValidatingTokens = useRef(false);
 
   const onInit = useCallback(async () => {
+    if (isValidatingTokens.current) return;
+
+    isValidatingTokens.current = true;
+
     try {
       await validateTokens(
         accessTokenCookieName,
@@ -93,7 +99,9 @@ export const AuthProvider = ({
   const signIn = useCallback(
     (requestBody: unknown) => {
       axios
-        .post(signInEndpoint, requestBody, { headers: { framework: 'react' } })
+        .post(signInEndpoint, requestBody, {
+          headers: { framework: import.meta.env.VITE_APP_FRAMEWORK as string },
+        })
         .then((r) => {
           const accessToken = accessTokenAccessor(r.data);
           const refreshToken = refreshTokenAccessor(r.data);
