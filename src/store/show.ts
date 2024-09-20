@@ -8,10 +8,12 @@ export interface IShow {
   imgUrl?: string;
   season?: number;
   episode?: number;
+  isArchived?: boolean;
 }
 
 class ShowStore {
   shows: IShow[] = [];
+  archivedShows: IShow[] = [];
 
   constructor() {
     makeAutoObservable(this);

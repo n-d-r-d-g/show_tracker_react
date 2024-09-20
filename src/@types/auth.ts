@@ -21,6 +21,7 @@ export interface IApiShow {
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;
+  archived_at?: string | null;
 }
 
 export interface Payload {

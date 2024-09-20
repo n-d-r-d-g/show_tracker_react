@@ -30,7 +30,7 @@ function ShowItem({ show }: Props) {
   }, [show.episode, show.season, show.url]);
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="relative flex flex-row items-center gap-2">
       <img
         src={show.imgUrl ?? './logo192.png'}
         alt={`${show.title} cover`}
@@ -127,6 +127,21 @@ function ShowItem({ show }: Props) {
       <button
         type="button"
         onClick={() => {
+          const newIsArchived = !show.isArchived;
+          showStore.updateShowById(show.id!, { isArchived: newIsArchived });
+
+          axios.patch(
+            `${import.meta.env.VITE_APP_API_URL}shows/${show.id}/${
+              newIsArchived ? 'archive' : 'unarchive'
+            }`
+          );
+        }}
+      >
+        {show.isArchived ? 'Unarchive' : 'Archive'}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
 
           showStore.deleteShow(show.id!);
@@ -134,6 +149,9 @@ function ShowItem({ show }: Props) {
       >
         Delete
       </button>
+      {show.isArchived && (
+        <div className="absolute w-full h-[2px] top-1/2 left-0 translate-y-1/2 bg-gray-500"></div>
+      )}
     </div>
   );
 }

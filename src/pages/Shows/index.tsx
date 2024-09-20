@@ -34,6 +34,7 @@ const Shows = observer(function () {
         imgUrl: show.image,
         season: show.season,
         episode: show.episode,
+        isArchived: !!show.archived_at,
       })) as Array<IShow>;
 
       showStore.setShows(newShows);
