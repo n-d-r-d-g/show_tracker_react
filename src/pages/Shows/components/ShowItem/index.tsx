@@ -150,7 +150,7 @@ function ShowItem({ show }: Props) {
         Delete
       </button>
       {show.isArchived && (
-        <div className="absolute w-full h-[2px] top-1/2 left-0 translate-y-1/2 bg-gray-500"></div>
+        <div className="absolute w-full h-[2px] top-1/2 left-0 -translate-y-1/2 bg-gray-500"></div>
       )}
     </div>
   );
