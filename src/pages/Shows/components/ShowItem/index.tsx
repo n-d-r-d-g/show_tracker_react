@@ -125,6 +125,7 @@ function ShowItem({ show }: Props) {
         Watch now
       </a>
       <button
+        type="button"
         onClick={() => {
           axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
 
