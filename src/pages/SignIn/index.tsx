@@ -1,6 +1,7 @@
 import { FormEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import { Button } from '../../components/ui/button';
 
 function SignIn() {
   const { t: tSignIn } = useTranslation('signIn');
@@ -32,7 +33,7 @@ function SignIn() {
         <input name="username" />
         <label htmlFor="password">{tSignIn('password')}</label>
         <input name="password" type="password" />
-        <button>{tSignIn('signIn')}</button>
+        <Button>{tSignIn('signIn')}</Button>
       </form>
     </>
   );
