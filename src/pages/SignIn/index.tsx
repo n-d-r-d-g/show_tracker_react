@@ -2,6 +2,8 @@ import { FormEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/ui/button';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
 
 function SignIn() {
   const { t: tSignIn } = useTranslation('signIn');
@@ -25,17 +27,28 @@ function SignIn() {
   );
 
   return (
-    <>
-      <h1>{tSignIn('title')}</h1>
-      <p>{tSignIn('description')}</p>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">{tSignIn('username')}</label>
-        <input name="username" />
-        <label htmlFor="password">{tSignIn('password')}</label>
-        <input name="password" type="password" />
-        <Button>{tSignIn('signIn')}</Button>
+    <main className="max-w-full w-80 min-h-[100svh] px-4 py-8 place-content-center mx-auto">
+      <h1 className="text-4xl sm:text-4xl text-center">{tSignIn('title')}</h1>
+      <p className="text-center">{tSignIn('description')}</p>
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 flex flex-col items-start gap-4"
+      >
+        <div className="w-full flex flex-col items-start gap-1">
+          <Label htmlFor="username">{tSignIn('username')}</Label>
+          <Input name="username" placeholder={tSignIn('username')} />
+        </div>
+        <div className="w-full flex flex-col items-start gap-1">
+          <Label htmlFor="password">{tSignIn('password')}</Label>
+          <Input
+            name="password"
+            type="password"
+            placeholder={tSignIn('password')}
+          />
+        </div>
+        <Button className="w-full">{tSignIn('signIn')}</Button>
       </form>
-    </>
+    </main>
   );
 }
 
