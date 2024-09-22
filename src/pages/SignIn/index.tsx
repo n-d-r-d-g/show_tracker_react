@@ -1,10 +1,10 @@
 import { FormEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ThemeSwitch } from '../../components/theme-switch';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useAuth } from '../../hooks/useAuth';
+import DefaultLayout from '../../layouts/DefaultLayout';
 
 function SignIn() {
   const { t: tSignIn } = useTranslation('signIn');
@@ -28,10 +28,11 @@ function SignIn() {
   );
 
   return (
-    <main className="max-w-full w-80 min-h-[100svh] px-4 py-8 place-content-center mx-auto">
-      <ThemeSwitch />
+    <DefaultLayout className="w-80">
       <h1 className="text-4xl sm:text-4xl text-center">{tSignIn('title')}</h1>
-      <p className="text-center">{tSignIn('description')}</p>
+      <p className="text-center font-light italic text-neutral-600 dark:text-neutral-300">
+        {tSignIn('description')}
+      </p>
       <form
         onSubmit={handleSubmit}
         className="mt-8 flex flex-col items-start gap-4"
@@ -48,9 +49,9 @@ function SignIn() {
             placeholder={tSignIn('password')}
           />
         </div>
-        <Button className="w-full">{tSignIn('signIn')}</Button>
+        <Button className="w-full mt-2">{tSignIn('signIn')}</Button>
       </form>
-    </main>
+    </DefaultLayout>
   );
 }
 

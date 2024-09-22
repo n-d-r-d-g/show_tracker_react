@@ -64,5 +64,7 @@ h6 {
 */
 #root,
 #__next {
+  @apply min-h-[100svh] flex flex-col;
+
   isolation: isolate;
 }
