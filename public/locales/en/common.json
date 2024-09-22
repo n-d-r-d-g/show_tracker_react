@@ -1,4 +1,10 @@
 {
   "title": "Show Tracker",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
 }

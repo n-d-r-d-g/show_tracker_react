@@ -1,9 +1,10 @@
 import { FormEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../hooks/useAuth';
+import { ThemeSwitch } from '../../components/theme-switch';
 import { Button } from '../../components/ui/button';
-import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { useAuth } from '../../hooks/useAuth';
 
 function SignIn() {
   const { t: tSignIn } = useTranslation('signIn');
@@ -28,6 +29,7 @@ function SignIn() {
 
   return (
     <main className="max-w-full w-80 min-h-[100svh] px-4 py-8 place-content-center mx-auto">
+      <ThemeSwitch />
       <h1 className="text-4xl sm:text-4xl text-center">{tSignIn('title')}</h1>
       <p className="text-center">{tSignIn('description')}</p>
       <form
