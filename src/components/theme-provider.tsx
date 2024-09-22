@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -26,27 +32,49 @@ export function ThemeProvider({
   storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
+  const darkThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const root = window.document.documentElement;
+
+  const removeAllThemeClasses = useCallback(
+    () => root.classList.remove('light', 'dark'),
+    [root.classList]
+  );
+
+  const handleSystemThemeChange = useCallback(() => {
+    removeAllThemeClasses();
+
+    root.classList.add(darkThemeMediaQuery.matches ? 'dark' : 'light');
+  }, [darkThemeMediaQuery.matches, removeAllThemeClasses, root.classList]);
 
   useEffect(() => {
-    const root = window.document.documentElement;
-
-    root.classList.remove('light', 'dark');
+    removeAllThemeClasses();
 
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
+      handleSystemThemeChange();
 
-      root.classList.add(systemTheme);
+      darkThemeMediaQuery.addEventListener('change', handleSystemThemeChange);
+
       return;
     }
 
+    darkThemeMediaQuery.removeEventListener('change', handleSystemThemeChange);
     root.classList.add(theme);
-  }, [theme]);
+
+    return () =>
+      darkThemeMediaQuery.removeEventListener(
+        'change',
+        handleSystemThemeChange
+      );
+  }, [
+    darkThemeMediaQuery,
+    handleSystemThemeChange,
+    removeAllThemeClasses,
+    root.classList,
+    theme,
+  ]);
 
   const value = {
     theme,
