@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -32,7 +33,9 @@ export function ThemeProvider({
   storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const darkThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const darkThemeMediaQuery = useRef(
+    window.matchMedia('(prefers-color-scheme: dark)')
+  );
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
@@ -43,49 +46,59 @@ export function ThemeProvider({
     [root.classList]
   );
 
+  const setThemeClass = useCallback(
+    (themeClass: Exclude<Theme, 'system'>) => root.classList.add(themeClass),
+    [root.classList]
+  );
+
   const handleSystemThemeChange = useCallback(() => {
     removeAllThemeClasses();
+    setThemeClass(darkThemeMediaQuery.current.matches ? 'dark' : 'light');
+  }, [removeAllThemeClasses, setThemeClass]);
 
-    root.classList.add(darkThemeMediaQuery.matches ? 'dark' : 'light');
-  }, [darkThemeMediaQuery.matches, removeAllThemeClasses, root.classList]);
+  const removeColorSchemePreferenceListener = useCallback(() => {
+    darkThemeMediaQuery.current.removeEventListener(
+      'change',
+      handleSystemThemeChange
+    );
+  }, [handleSystemThemeChange]);
 
   useEffect(() => {
-    removeAllThemeClasses();
-
     if (theme === 'system') {
       handleSystemThemeChange();
 
-      darkThemeMediaQuery.addEventListener('change', handleSystemThemeChange);
-
-      return;
-    }
-
-    darkThemeMediaQuery.removeEventListener('change', handleSystemThemeChange);
-    root.classList.add(theme);
-
-    return () =>
-      darkThemeMediaQuery.removeEventListener(
+      return darkThemeMediaQuery.current.addEventListener(
         'change',
         handleSystemThemeChange
       );
+    }
+
+    removeAllThemeClasses();
+    removeColorSchemePreferenceListener();
+    setThemeClass(theme);
+
+    return removeColorSchemePreferenceListener;
   }, [
     darkThemeMediaQuery,
     handleSystemThemeChange,
     removeAllThemeClasses,
+    removeColorSchemePreferenceListener,
     root.classList,
+    setThemeClass,
     theme,
   ]);
 
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
-  };
-
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider
+      {...props}
+      value={{
+        theme,
+        setTheme: (theme: Theme) => {
+          localStorage.setItem(storageKey, theme);
+          setTheme(theme);
+        },
+      }}
+    >
       {children}
     </ThemeProviderContext.Provider>
   );
@@ -95,7 +108,7 @@ export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
   if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useTheme must be used within a ThemeProvider!');
 
   return context;
 };
