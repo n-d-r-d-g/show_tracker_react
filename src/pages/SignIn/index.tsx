@@ -39,11 +39,16 @@ function SignIn() {
       >
         <div className="w-full flex flex-col items-start gap-1">
           <Label htmlFor="username">{tSignIn('username')}</Label>
-          <Input name="username" placeholder={tSignIn('username')} />
+          <Input
+            id="username"
+            name="username"
+            placeholder={tSignIn('username')}
+          />
         </div>
         <div className="w-full flex flex-col items-start gap-1">
           <Label htmlFor="password">{tSignIn('password')}</Label>
           <Input
+            id="password"
             name="password"
             type="password"
             placeholder={tSignIn('password')}
