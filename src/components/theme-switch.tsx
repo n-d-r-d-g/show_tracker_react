@@ -19,7 +19,7 @@ function ThemeIcons() {
       <Icon
         key={themeObj.key}
         data-active={themeObj.key === theme}
-        className="absolute h-full w-full p-2 text-neutral-500 dark:text-neutral-300 -rotate-90 scale-0 opacity-0 data-[active='true']:rotate-0 data-[active='true']:scale-100 data-[active='true']:opacity-100 transition-all"
+        className="absolute h-full w-full p-2 text-neutral-500 dark:text-neutral-300 -rotate-90 scale-0 opacity-0 data-[active='true']:rotate-0 data-[active='true']:scale-100 data-[active='true']:opacity-100 motion-safe:transition-all"
       />
     );
   });
