@@ -8,7 +8,7 @@ interface Props {
 }
 
 function ShowItem({ show }: Props) {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     return () => clearTimeout(timeoutRef.current);
