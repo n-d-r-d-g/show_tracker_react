@@ -1,3 +1,4 @@
+import DefaultLayout from '@/layouts/DefaultLayout';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +10,7 @@ import showStore, { IShow } from '../../store/show';
 import ShowList from './components/ShowList';
 
 const Shows = observer(function () {
-  const { user, signOut, signOutAll } = useAuth();
+  const { user } = useAuth();
   const [show, setShow] = useState<IShow>({
     order: -1,
     title: '',
@@ -39,24 +40,15 @@ const Shows = observer(function () {
 
       showStore.setShows(newShows);
     });
-  }, [user]);
-
-  const handleSignOut = useCallback(() => {
-    signOut();
-    showStore.setShows([]);
-  }, [signOut]);
-
-  const handleSignOutAll = useCallback(() => {
-    signOutAll();
-    showStore.setShows([]);
-  }, [signOutAll]);
+  }, []);
 
   const handleAddShow = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       const showId = uuidv4();
-      const showOrder = showStore.shows[showStore.shows.length - 1].order + 1;
+      const showOrder =
+        (showStore.shows[showStore.shows.length - 1]?.order ?? 0) + 1;
 
       showStore.addShow({
         ...show,
@@ -86,14 +78,12 @@ const Shows = observer(function () {
   );
 
   return (
-    <>
-      {user?.username && <h1>Welcome {user.username}</h1>}
-      <button type="button" onClick={handleSignOut} disabled={!user}>
-        Log out
-      </button>
-      <button type="button" onClick={handleSignOutAll} disabled={!user}>
-        Log out on all devices
-      </button>
+    <DefaultLayout className="place-content-start">
+      {user?.username && (
+        <h1 className="text-xl md:text-2xl text-center font-bold">
+          Welcome {user.username}
+        </h1>
+      )}
       <form
         onSubmit={handleAddShow}
         className="flex flex-row justify-center items-center gap-2"
@@ -139,7 +129,7 @@ const Shows = observer(function () {
         <button type="submit">Add show</button>
       </form>
       <ShowList />
-    </>
+    </DefaultLayout>
   );
 });
 

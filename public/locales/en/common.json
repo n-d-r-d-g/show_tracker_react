@@ -1,6 +1,9 @@
 {
   "title": "Show Tracker",
   "loading": "Loading...",
+  "signOutOptions": "Sign out",
+  "signOut": "Sign out from app",
+  "signOutEverywhere": "Sign out from everywhere",
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",

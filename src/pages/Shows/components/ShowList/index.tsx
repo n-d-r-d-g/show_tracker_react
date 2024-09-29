@@ -41,7 +41,7 @@ const ShowList = observer(function () {
       list={showStore.shows as Array<ItemInterface>}
       setList={() => undefined}
       onEnd={handleDragEnd}
-      className="flex flex-col gap-2"
+      className="w-fit max-w-full flex flex-col gap-2 mx-auto"
     >
       {showStore.shows.map((show) => (
         <ShowItem key={show.id} show={show} />

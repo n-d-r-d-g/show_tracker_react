@@ -1,4 +1,13 @@
-import { PropsWithChildren } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
+import showStore from '@/store/show';
+import { Power } from 'lucide-react';
+import { PropsWithChildren, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ThemeSwitch } from '../../components/theme-switch';
@@ -8,6 +17,41 @@ import { cn } from '../../lib/utils';
 type Props = PropsWithChildren<{
   className?: string;
 }>;
+
+function Actions() {
+  const { t: tCommon } = useTranslation('common');
+  const { isSignedIn, signOut, signOutAll } = useAuth();
+
+  const handleSignOut = useCallback(() => {
+    signOut();
+    showStore.setShows([]);
+  }, [signOut]);
+
+  const handleSignOutEverywhere = useCallback(() => {
+    signOutAll();
+    showStore.setShows([]);
+  }, [signOutAll]);
+
+  if (!isSignedIn) return;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" title={tCommon('signOutOptions')}>
+          <Power className="h-full w-full p-2 text-red-800 dark:text-red-300" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuItem onClick={handleSignOut}>
+          <span>{tCommon('signOut')}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOutEverywhere}>
+          <span>{tCommon('signOutEverywhere')}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default function DefaultLayout({ className, children }: Props) {
   const { t: tCommon } = useTranslation('common');
@@ -20,7 +64,10 @@ export default function DefaultLayout({ className, children }: Props) {
             {tCommon('title')}
           </Link>
         </Button>
-        <ThemeSwitch />
+        <aside>
+          <ThemeSwitch />
+          <Actions />
+        </aside>
       </header>
       <main
         className={cn(
