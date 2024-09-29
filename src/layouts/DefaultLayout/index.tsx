@@ -64,7 +64,7 @@ export default function DefaultLayout({ className, children }: Props) {
             {tCommon('title')}
           </Link>
         </Button>
-        <aside>
+        <aside className="flex flex-row items-center">
           <ThemeSwitch />
           <Actions />
         </aside>
