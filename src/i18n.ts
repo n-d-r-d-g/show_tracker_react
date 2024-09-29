@@ -30,7 +30,7 @@ i18n
     // },
     lng: 'en',
     supportedLngs: ['en'],
-    ns: ['common', 'error', 'home', 'signIn'],
+    ns: ['common', 'error', 'shows', 'signIn'],
     defaultNS: defaultNS,
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default

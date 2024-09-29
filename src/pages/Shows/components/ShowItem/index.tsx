@@ -1,13 +1,18 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import axios from 'axios';
+import { FolderOutput, FolderSymlink, Play, Trash } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
-import showStore, { IShow } from '../../../../store/show';
+import { useTranslation } from 'react-i18next';
 import { DEBOUNCE_TIMEOUT_IN_MS } from '../../../../constants';
+import showStore, { IShow } from '../../../../store/show';
 
 interface Props {
   show: IShow;
 }
 
 function ShowItem({ show }: Props) {
+  const { t: tShows } = useTranslation('shows');
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
@@ -37,7 +42,7 @@ function ShowItem({ show }: Props) {
         width="24px"
         height="24px"
       />
-      <input
+      <Input
         name="title"
         defaultValue={show.title}
         onChange={(e) => {
@@ -52,7 +57,7 @@ function ShowItem({ show }: Props) {
           }, DEBOUNCE_TIMEOUT_IN_MS);
         }}
       />
-      <input
+      <Input
         name="url"
         defaultValue={show.url}
         onChange={(e) => {
@@ -69,14 +74,17 @@ function ShowItem({ show }: Props) {
           }, DEBOUNCE_TIMEOUT_IN_MS);
         }}
       />
-      <div>
-        <small>S: </small>
-        <input
+      <div className="flex flex-row items-center gap-2">
+        <small title={tShows('season')} aria-label={tShows('season')}>
+          S:
+        </small>
+        <Input
           name="season"
           type="number"
           defaultValue={show.season}
           min={0}
           max={99}
+          className="min-w-[4.5rem]"
           onChange={(e) => {
             clearTimeout(timeoutRef.current);
 
@@ -95,14 +103,17 @@ function ShowItem({ show }: Props) {
           }}
         />
       </div>
-      <div>
-        <small>E: </small>
-        <input
+      <div className="flex flex-row items-center gap-2">
+        <small title={tShows('episode')} aria-label={tShows('episode')}>
+          E:
+        </small>
+        <Input
           name="episode"
           type="number"
           defaultValue={show.episode}
           min={0}
           max={99}
+          className="min-w-[4.5rem]"
           onChange={(e) => {
             clearTimeout(timeoutRef.current);
 
@@ -121,11 +132,23 @@ function ShowItem({ show }: Props) {
           }}
         />
       </div>
-      <a href={sanitizedURL()} target="_blank" rel="noreferrer">
-        Watch now
-      </a>
-      <button
+      <Button size="icon" variant="ghost" className="min-w-9 min-h-9" asChild>
+        <a
+          href={sanitizedURL()}
+          target="_blank"
+          rel="noreferrer"
+          title={tShows('watchNow')}
+          aria-label={tShows('watchNow')}
+        >
+          <Play className="w-4 h-4 text-green-800 dark:text-green-400" />
+        </a>
+      </Button>
+      <Button
         type="button"
+        title={show.isArchived ? tShows('unarchive') : tShows('archive')}
+        aria-label={show.isArchived ? tShows('unarchive') : tShows('archive')}
+        variant="ghost"
+        className="min-w-9 min-h-9 p-0"
         onClick={() => {
           const newIsArchived = !show.isArchived;
           showStore.updateShowById(show.id!, { isArchived: newIsArchived });
@@ -137,20 +160,28 @@ function ShowItem({ show }: Props) {
           );
         }}
       >
-        {show.isArchived ? 'Unarchive' : 'Archive'}
-      </button>
-      <button
+        {show.isArchived ? (
+          <FolderOutput className="w-4 h-4 text-yellow-900 dark:text-yellow-300" />
+        ) : (
+          <FolderSymlink className="w-4 h-4 text-yellow-900 dark:text-yellow-300" />
+        )}
+      </Button>
+      <Button
         type="button"
+        title={tShows('delete')}
+        aria-label={tShows('delete')}
+        variant="ghost"
+        className="min-w-9 min-h-9 p-0"
         onClick={() => {
           axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
 
           showStore.deleteShow(show.id!);
         }}
       >
-        Delete
-      </button>
+        <Trash className="w-4 h-4 text-red-800 dark:text-red-300" />
+      </Button>
       {show.isArchived && (
-        <div className="absolute w-full h-[2px] top-1/2 left-0 -translate-y-1/2 bg-gray-500"></div>
+        <div className="absolute w-full h-[2px] top-1/2 left-0 -translate-y-1/2 bg-gray-500 pointer-events-none"></div>
       )}
     </div>
   );

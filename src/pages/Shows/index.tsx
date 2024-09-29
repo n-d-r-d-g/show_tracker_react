@@ -1,6 +1,9 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import DefaultLayout from '@/layouts/DefaultLayout';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { Plus } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,9 +11,11 @@ import { IApiShow } from '../../@types/auth';
 import { useAuth } from '../../hooks/useAuth';
 import showStore, { IShow } from '../../store/show';
 import ShowList from './components/ShowList';
+import { useTranslation } from 'react-i18next';
 
 const Shows = observer(function () {
   const { user } = useAuth();
+  const { t: tShows } = useTranslation('shows');
   const [show, setShow] = useState<IShow>({
     order: -1,
     title: '',
@@ -80,34 +85,35 @@ const Shows = observer(function () {
   return (
     <DefaultLayout className="place-content-start">
       {user?.username && (
-        <h1 className="text-xl md:text-2xl text-center font-bold">
-          Welcome {user.username}
+        <h1 className="mb-8 text-xl md:text-2xl text-center font-bold">
+          {tShows('welcome')} {user.username}
         </h1>
       )}
+      <ShowList />
       <form
         onSubmit={handleAddShow}
-        className="flex flex-row justify-center items-center gap-2"
+        className="flex flex-row justify-center items-center gap-2 mt-6"
       >
-        <input
+        <Input
           name="title"
-          placeholder="Title"
+          placeholder={tShows('title')}
           value={show.title}
           onChange={(e) =>
             setShow((prev) => ({ ...prev, title: e.target.value }))
           }
         />
-        <input
+        <Input
           name="url"
-          placeholder="Url"
+          placeholder={tShows('url')}
           value={show.url}
           onChange={(e) =>
             setShow((prev) => ({ ...prev, url: e.target.value }))
           }
         />
-        <input
+        <Input
           name="season"
           type="number"
-          placeholder="Season"
+          placeholder={tShows('season')}
           defaultValue={show.season}
           min={0}
           max={99}
@@ -115,10 +121,10 @@ const Shows = observer(function () {
             setShow((prev) => ({ ...prev, season: +e.target.value }))
           }
         />
-        <input
+        <Input
           name="episode"
           type="number"
-          placeholder="Episode"
+          placeholder={tShows('episode')}
           defaultValue={show.episode}
           min={0}
           max={99}
@@ -126,9 +132,15 @@ const Shows = observer(function () {
             setShow((prev) => ({ ...prev, episode: +e.target.value }))
           }
         />
-        <button type="submit">Add show</button>
+        <Button
+          type="submit"
+          variant="ghost"
+          className="text-green-800 dark:text-green-400 hover:text-white dark:hover:text-black hover:bg-green-800 dark:hover:bg-green-400 hover:border-green-800 dark:hover:border-green-400 focus-visible:text-white dark:focus-visible:text-black focus-visible:bg-green-800 dark:focus-visible:bg-green-400 focus-visible:border-green-800 dark:focus-visible:border-green-400 motion-safe:transition-all"
+        >
+          <Plus className="mr-2 min-h-4 min-w-4" />
+          {tShows('addShow')}
+        </Button>
       </form>
-      <ShowList />
     </DefaultLayout>
   );
 });

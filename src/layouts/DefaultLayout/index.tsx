@@ -38,7 +38,7 @@ function Actions() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" title={tCommon('signOutOptions')}>
-          <Power className="h-full w-full p-2 text-red-800 dark:text-red-300" />
+          <Power className="h-full w-full p-2 text-neutral-600 dark:text-neutral-300" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
