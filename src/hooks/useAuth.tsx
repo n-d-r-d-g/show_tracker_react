@@ -35,8 +35,8 @@ export interface TAuthContext {
   isSignedIn: boolean;
   setUser: Dispatch<SetStateAction<User | null>>;
   signIn: (requestBody: unknown) => void;
-  signOut: () => void;
-  signOutAll: () => void;
+  signOut: () => Promise<void>;
+  signOutAll: () => Promise<void>;
 }
 
 const AuthContext = createContext<TAuthContext | undefined>(undefined);
@@ -149,39 +149,27 @@ export const AuthProvider = ({
     ]
   );
 
-  const signOut = useCallback(() => {
-    axios
-      .get(signOutEndpoint)
-      .then(() => {
-        setUser(null);
+  const deleteCookies = useCallback(() => {
+    const opts: Cookies.CookieAttributes = {
+      secure: true,
+      sameSite: 'Lax',
+    };
 
-        const opts: Cookies.CookieAttributes = {
-          secure: true,
-          sameSite: 'Lax',
-        };
+    Cookies.remove(accessTokenCookieName, opts);
+    Cookies.remove(refreshTokenCookieName, opts);
+  }, [accessTokenCookieName, refreshTokenCookieName]);
 
-        Cookies.remove(accessTokenCookieName, opts);
-        Cookies.remove(refreshTokenCookieName, opts);
-      })
-      .catch((e) => console.log('e :>> ', e));
-  }, [accessTokenCookieName, refreshTokenCookieName, signOutEndpoint]);
+  const signOut = useCallback(async () => {
+    setUser(null);
 
-  const signOutAll = useCallback(() => {
-    axios
-      .get(signOutAllEndpoint)
-      .then(() => {
-        setUser(null);
+    await axios.get(signOutEndpoint).finally(deleteCookies);
+  }, [deleteCookies, signOutEndpoint]);
 
-        const opts: Cookies.CookieAttributes = {
-          secure: true,
-          sameSite: 'Lax',
-        };
+  const signOutAll = useCallback(async () => {
+    setUser(null);
 
-        Cookies.remove(accessTokenCookieName, opts);
-        Cookies.remove(refreshTokenCookieName, opts);
-      })
-      .catch((e) => console.log('e :>> ', e));
-  }, [accessTokenCookieName, refreshTokenCookieName, signOutAllEndpoint]);
+    await axios.get(signOutAllEndpoint).finally(deleteCookies);
+  }, [deleteCookies, signOutAllEndpoint]);
 
   return (
     <AuthContext.Provider

@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css';
 import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from './components/ui/toaster';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { ErrorPage, ShowsPage, SignInPage } from './pages';
-import './App.css';
 
 function AppRoutes() {
   const { isSignedIn } = useAuth();
@@ -40,6 +41,7 @@ function App() {
           >
             <AppRoutes />
           </AuthProvider>
+          <Toaster />
         </Suspense>
       </ThemeProvider>
     </BrowserRouter>
