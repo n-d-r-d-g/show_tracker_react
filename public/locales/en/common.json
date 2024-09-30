@@ -9,5 +9,9 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "errors": {
+    "error": "Error!",
+    "signOut": "We couldn't sign you out due to an unexpected error on our end. Next time you sign out, please choose `Sign out everywhere` to make sure there's no unauthorized access to your account."
   }
 }

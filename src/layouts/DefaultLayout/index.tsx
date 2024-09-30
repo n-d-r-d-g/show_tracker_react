@@ -4,8 +4,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import showStore from '@/store/show';
+import { AxiosError } from 'axios';
 import { Power } from 'lucide-react';
 import { PropsWithChildren, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,16 +23,45 @@ type Props = PropsWithChildren<{
 function Actions() {
   const { t: tCommon } = useTranslation('common');
   const { isSignedIn, signOut, signOutAll } = useAuth();
+  const { toast } = useToast();
 
-  const handleSignOut = useCallback(() => {
-    signOut();
-    showStore.setShows([]);
-  }, [signOut]);
+  const handleSignOut = useCallback(async () => {
+    try {
+      await signOut();
+    } catch (e) {
+      console.log(
+        'e :>> ',
+        `${(e as AxiosError).code} | ${(e as AxiosError).message}`
+      );
 
-  const handleSignOutEverywhere = useCallback(() => {
-    signOutAll();
+      toast({
+        variant: 'destructive',
+        title: tCommon('errors.error'),
+        description: tCommon('errors.signOut'),
+      });
+    }
+
     showStore.setShows([]);
-  }, [signOutAll]);
+  }, [signOut, tCommon, toast]);
+
+  const handleSignOutEverywhere = useCallback(async () => {
+    try {
+      await signOutAll();
+    } catch (e) {
+      console.log(
+        'e :>> ',
+        `${(e as AxiosError).code} | ${(e as AxiosError).message}`
+      );
+
+      toast({
+        variant: 'destructive',
+        title: tCommon('errors.error'),
+        description: tCommon('errors.signOut'),
+      });
+    }
+
+    showStore.setShows([]);
+  }, [signOutAll, tCommon, toast]);
 
   if (!isSignedIn) return;
 
@@ -42,10 +73,10 @@ function Actions() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem onClick={handleSignOut as () => void}>
           <span>{tCommon('signOut')}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSignOutEverywhere}>
+        <DropdownMenuItem onClick={handleSignOutEverywhere as () => void}>
           <span>{tCommon('signOutEverywhere')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
