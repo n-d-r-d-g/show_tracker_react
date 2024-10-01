@@ -39,8 +39,6 @@ function SignIn() {
 
   const onSubmit = useCallback(
     ({ username, password }: FormValues) => {
-      console.log('vals :>> ', { username, password });
-
       signIn({ username, password });
     },
     [signIn]
