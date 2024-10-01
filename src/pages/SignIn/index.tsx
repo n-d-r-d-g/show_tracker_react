@@ -1,7 +1,9 @@
 import { ErrorMessage } from '@/components/error-message';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCallback } from 'react';
+import { AxiosError } from 'axios';
+import { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
@@ -20,13 +22,18 @@ function SignIn() {
   const { t: tCommon } = useTranslation('common');
   const { t: tSignIn } = useTranslation('signIn');
   const { signIn } = useAuth();
+  const { toast } = useToast();
 
-  const schema = yup
-    .object({
-      username: yup.string().required(),
-      password: yup.string().required(),
-    })
-    .required();
+  const schema = useMemo(
+    () =>
+      yup
+        .object({
+          username: yup.string().required(),
+          password: yup.string().required(),
+        })
+        .required(),
+    []
+  );
 
   const {
     register,
@@ -39,9 +46,22 @@ function SignIn() {
 
   const onSubmit = useCallback(
     ({ username, password }: FormValues) => {
-      signIn({ username, password });
+      try {
+        signIn({ username, password });
+      } catch (e) {
+        console.log(
+          'e :>> ',
+          `${(e as AxiosError).code} | ${(e as AxiosError).message}`
+        );
+
+        toast({
+          variant: 'destructive',
+          title: tCommon('errors.error'),
+          description: tCommon('errors.signIn'),
+        });
+      }
     },
-    [signIn]
+    [signIn, tCommon, toast]
   );
 
   return (
