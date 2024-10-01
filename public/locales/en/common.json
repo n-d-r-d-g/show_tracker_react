@@ -12,6 +12,10 @@
   },
   "errors": {
     "error": "Error!",
-    "signOut": "We couldn't sign you out due to an unexpected error on our end. Next time you sign out, please choose `Sign out everywhere` to make sure there's no unauthorized access to your account."
+    "signOut": "We couldn't sign you out due to an unexpected error on our end. Next time you sign out, please choose `Sign out everywhere` to make sure there's no unauthorized access to your account.",
+    "formContainsErrors": "Please fix all errors in the form.",
+    "form": {
+      "required": "Please fill in this field."
+    }
   }
 }
