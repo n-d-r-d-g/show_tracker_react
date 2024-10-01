@@ -31,7 +31,7 @@ function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'all',
     resolver: yupResolver(schema),
@@ -43,7 +43,7 @@ function SignIn() {
     },
     [signIn]
   );
-  console.log('isDirty :>> ', isDirty);
+
   return (
     <DefaultLayout className="w-80">
       <h1 className="text-4xl sm:text-4xl text-center">{tSignIn('title')}</h1>
