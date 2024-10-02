@@ -3,5 +3,9 @@
   "description": "Please sign in to continue.",
   "username": "Username",
   "password": "Password",
-  "signIn": "Sign in"
+  "signIn": "Sign in",
+  "errors": {
+    "notFound": "Please make sure your username and password are correct.",
+    "tryWithNextPassword": "Please try again with the next password."
+  }
 }

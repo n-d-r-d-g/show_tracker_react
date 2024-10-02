@@ -34,7 +34,7 @@ export interface TAuthContext {
   user: User | null;
   isSignedIn: boolean;
   setUser: Dispatch<SetStateAction<User | null>>;
-  signIn: (requestBody: unknown) => void;
+  signIn: (requestBody: unknown) => Promise<void>;
   signOut: () => Promise<void>;
   signOutAll: () => Promise<void>;
 }
@@ -97,47 +97,34 @@ export const AuthProvider = ({
   }, []);
 
   const signIn = useCallback(
-    (requestBody: unknown) => {
-      axios
-        .post(signInEndpoint, requestBody, {
-          headers: { framework: import.meta.env.VITE_APP_FRAMEWORK as string },
-        })
-        .then((r) => {
-          const accessToken = accessTokenAccessor(r.data);
-          const refreshToken = refreshTokenAccessor(r.data);
-          const accessTokenExpires = tokenExpiryDateAccessor(
-            (r.data as MockSignInResponse).access_token
-          );
-          const refreshTokenExpires = tokenExpiryDateAccessor(
-            (r.data as MockSignInResponse).refresh_token
-          );
-          const accessTokenCookieOpts: Cookies.CookieAttributes = {
-            expires: accessTokenExpires,
-            secure: true,
-            sameSite: 'Lax',
-          };
-          const refreshTokenCookieOpts: Cookies.CookieAttributes = {
-            expires: refreshTokenExpires,
-            secure: true,
-            sameSite: 'Lax',
-          };
+    async (requestBody: unknown) => {
+      const response = await axios.post(signInEndpoint, requestBody, {
+        headers: { framework: import.meta.env.VITE_APP_FRAMEWORK as string },
+      });
 
-          setUser(userAccessor(accessToken));
+      const accessToken = accessTokenAccessor(response.data);
+      const refreshToken = refreshTokenAccessor(response.data);
+      const accessTokenExpires = tokenExpiryDateAccessor(
+        (response.data as MockSignInResponse).access_token
+      );
+      const refreshTokenExpires = tokenExpiryDateAccessor(
+        (response.data as MockSignInResponse).refresh_token
+      );
+      const accessTokenCookieOpts: Cookies.CookieAttributes = {
+        expires: accessTokenExpires,
+        secure: true,
+        sameSite: 'Lax',
+      };
+      const refreshTokenCookieOpts: Cookies.CookieAttributes = {
+        expires: refreshTokenExpires,
+        secure: true,
+        sameSite: 'Lax',
+      };
 
-          Cookies.set(
-            accessTokenCookieName,
-            accessToken,
-            accessTokenCookieOpts
-          );
-          Cookies.set(
-            refreshTokenCookieName,
-            refreshToken,
-            refreshTokenCookieOpts
-          );
-        })
-        .catch((e) => {
-          console.log('e :>> ', e);
-        });
+      setUser(userAccessor(accessToken));
+
+      Cookies.set(accessTokenCookieName, accessToken, accessTokenCookieOpts);
+      Cookies.set(refreshTokenCookieName, refreshToken, refreshTokenCookieOpts);
     },
     [
       accessTokenAccessor,

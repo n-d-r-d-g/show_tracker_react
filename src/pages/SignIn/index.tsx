@@ -22,7 +22,7 @@ function SignIn() {
   const { t: tCommon } = useTranslation('common');
   const { t: tSignIn } = useTranslation('signIn');
   const { signIn } = useAuth();
-  const { toast } = useToast();
+  const { toast, dismiss: dismissToast } = useToast();
 
   const schema = useMemo(
     () =>
@@ -38,30 +38,42 @@ function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<FormValues>({
     mode: 'all',
     resolver: yupResolver(schema),
   });
 
   const onSubmit = useCallback(
-    ({ username, password }: FormValues) => {
+    async ({ username, password }: FormValues) => {
+      dismissToast();
+
       try {
-        signIn({ username, password });
+        await signIn({ username, password });
       } catch (e) {
         console.log(
           'e :>> ',
           `${(e as AxiosError).code} | ${(e as AxiosError).message}`
         );
 
+        let errorDescription = tCommon('errors.signIn');
+
+        if ((e as AxiosError).status === 404) {
+          errorDescription = tSignIn('errors.notFound');
+        } else if ((e as AxiosError).status === 401) {
+          errorDescription = tSignIn('errors.notFound');
+        } else if ((e as AxiosError).status === 423) {
+          errorDescription = tSignIn('errors.tryWithNextPassword');
+        }
+
         toast({
           variant: 'destructive',
           title: tCommon('errors.error'),
-          description: tCommon('errors.signIn'),
+          description: errorDescription,
         });
       }
     },
-    [signIn, tCommon, toast]
+    [dismissToast, signIn, tCommon, tSignIn, toast]
   );
 
   return (
@@ -112,7 +124,7 @@ function SignIn() {
           </ErrorMessage>
         </div>
         <div className="w-full max-w-full flex flex-col gap-1">
-          <Button className="w-full mt-2" disabled={!isValid}>
+          <Button className="w-full mt-2" disabled={!isValid || isSubmitting}>
             {tSignIn('signIn')}
           </Button>
           <div
