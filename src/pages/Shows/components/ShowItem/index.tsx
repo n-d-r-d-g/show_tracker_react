@@ -6,6 +6,17 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEBOUNCE_TIMEOUT_IN_MS } from '../../../../constants';
 import showStore, { IShow } from '../../../../store/show';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface Props {
   show: IShow;
@@ -13,6 +24,7 @@ interface Props {
 
 function ShowItem({ show }: Props) {
   const { t: tShows } = useTranslation('shows');
+  const { t: tCommon } = useTranslation('common');
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
@@ -33,6 +45,12 @@ function ShowItem({ show }: Props) {
 
     return sanitizedShowURL;
   }, [show.episode, show.season, show.url]);
+
+  const deleteShow = useCallback(() => {
+    axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
+
+    showStore.deleteShow(show.id!);
+  }, [show.id]);
 
   return (
     <div className="relative flex flex-row items-center gap-2">
@@ -166,20 +184,35 @@ function ShowItem({ show }: Props) {
           <FolderSymlink className="w-4 h-4 text-yellow-900 dark:text-yellow-300" />
         )}
       </Button>
-      <Button
-        type="button"
-        title={tShows('delete')}
-        aria-label={tShows('delete')}
-        variant="ghost"
-        className="min-w-9 min-h-9 p-0"
-        onClick={() => {
-          axios.delete(`${import.meta.env.VITE_APP_API_URL}shows/${show.id}`);
-
-          showStore.deleteShow(show.id!);
-        }}
-      >
-        <Trash className="w-4 h-4 text-red-800 dark:text-red-300" />
-      </Button>
+      <AlertDialog>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {tShows('deleteConfirmation', { show: show.title })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {tShows('deleteDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteShow}>
+              {tCommon('delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+        <AlertDialogTrigger asChild>
+          <Button
+            type="button"
+            title={tCommon('delete')}
+            aria-label={tCommon('delete')}
+            variant="ghost"
+            className="min-w-9 min-h-9 p-0"
+          >
+            <Trash className="w-4 h-4 text-red-800 dark:text-red-300" />
+          </Button>
+        </AlertDialogTrigger>
+      </AlertDialog>
       {show.isArchived && (
         <div className="absolute w-full h-[2px] top-1/2 left-0 -translate-y-1/2 bg-gray-500 pointer-events-none"></div>
       )}
