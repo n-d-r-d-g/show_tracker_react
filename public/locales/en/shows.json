@@ -8,5 +8,6 @@
   "watchNow": "Watch now",
   "unarchive": "Unarchive",
   "archive": "Archive",
-  "delete": "Delete"
+  "deleteConfirmation": "Are you sure you want to delete {{show}}?",
+  "deleteDescription": "This action cannot be undone. This show will be permanently removed from our servers."
 }

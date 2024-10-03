@@ -4,6 +4,8 @@
   "signOutOptions": "Sign out",
   "signOut": "Sign out from app",
   "signOutEverywhere": "Sign out from everywhere",
+  "cancel": "Cancel",
+  "delete": "Delete",
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",
