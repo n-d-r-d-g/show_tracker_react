@@ -47,8 +47,11 @@ export function ThemeProvider({
   );
 
   const setThemeClass = useCallback(
-    (themeClass: Exclude<Theme, 'system'>) => root.classList.add(themeClass),
-    [root.classList]
+    (themeClass: Exclude<Theme, 'system'>) => {
+      root.classList.add(themeClass);
+      root.style.setProperty('color-scheme', themeClass);
+    },
+    [root.classList, root.style]
   );
 
   const handleSystemThemeChange = useCallback(() => {

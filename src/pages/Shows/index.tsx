@@ -135,7 +135,7 @@ const Shows = observer(function () {
         <Button
           type="submit"
           variant="ghost"
-          className="text-green-800 dark:text-green-400 hover:text-white dark:hover:text-black hover:bg-green-800 dark:hover:bg-green-400 hover:border-green-800 dark:hover:border-green-400 focus-visible:text-white dark:focus-visible:text-black focus-visible:bg-green-800 dark:focus-visible:bg-green-400 focus-visible:border-green-800 dark:focus-visible:border-green-400 motion-safe:transition-all"
+          className="text-green-900 dark:text-green-400 bg-green-100 dark:bg-green-950/50 hover:text-white dark:hover:text-black hover:bg-green-800 dark:hover:bg-green-400 hover:border-green-800 dark:hover:border-green-400 focus-visible:text-white dark:focus-visible:text-black focus-visible:bg-green-800 dark:focus-visible:bg-green-400 focus-visible:border-green-800 dark:focus-visible:border-green-400 motion-safe:transition-all"
         >
           <Plus className="mr-2 min-h-4 min-w-4" />
           {tShows('addShow')}
