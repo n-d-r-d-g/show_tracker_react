@@ -5,24 +5,28 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Plus } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useImmer } from 'use-immer';
 import { v4 as uuidv4 } from 'uuid';
 import { IApiShow } from '../../@types/auth';
 import { useAuth } from '../../hooks/useAuth';
 import showStore, { IShow } from '../../store/show';
 import ShowList from './components/ShowList';
-import { useTranslation } from 'react-i18next';
+
+const initialShow: Omit<IShow, 'id'> = {
+  order: -1,
+  title: '',
+  url: '',
+  season: 1,
+  episode: 1,
+  imgUrl: '',
+};
 
 const Shows = observer(function () {
   const { user } = useAuth();
   const { t: tShows } = useTranslation('shows');
-  const [show, setShow] = useState<IShow>({
-    order: -1,
-    title: '',
-    url: '',
-    season: 1,
-    episode: 1,
-  });
+  const [show, setShow] = useImmer(initialShow);
 
   useEffect(() => {
     const accessToken = Cookies.get(
@@ -70,16 +74,29 @@ const Shows = observer(function () {
         image: show.imgUrl,
       } as IApiShow);
 
-      setShow({
-        id: '',
-        order: -1,
-        title: '',
-        url: '',
-        season: 1,
-        episode: 1,
+      setShow((draft) => {
+        Object.entries(initialShow).forEach(([attr, val]) => {
+          draft[attr as keyof typeof draft] = val as never;
+        });
       });
     },
-    [show]
+    [setShow, show]
+  );
+
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setShow((draft) => {
+        const attr = e.target.name as keyof typeof draft;
+        let parsedValue: (typeof draft)[typeof attr] = e.target.value;
+
+        if (['order', 'season', 'episode'].includes(attr)) {
+          parsedValue = +parsedValue;
+        }
+
+        draft[attr] = parsedValue as never;
+      });
+    },
+    [setShow]
   );
 
   return (
@@ -98,39 +115,31 @@ const Shows = observer(function () {
           name="title"
           placeholder={tShows('title')}
           value={show.title}
-          onChange={(e) =>
-            setShow((prev) => ({ ...prev, title: e.target.value }))
-          }
+          onChange={handleChange}
         />
         <Input
           name="url"
           placeholder={tShows('url')}
           value={show.url}
-          onChange={(e) =>
-            setShow((prev) => ({ ...prev, url: e.target.value }))
-          }
+          onChange={handleChange}
         />
         <Input
           name="season"
           type="number"
           placeholder={tShows('season')}
-          defaultValue={show.season}
+          value={show.season}
           min={0}
           max={99}
-          onChange={(e) =>
-            setShow((prev) => ({ ...prev, season: +e.target.value }))
-          }
+          onChange={handleChange}
         />
         <Input
           name="episode"
           type="number"
           placeholder={tShows('episode')}
-          defaultValue={show.episode}
+          value={show.episode}
           min={0}
           max={99}
-          onChange={(e) =>
-            setShow((prev) => ({ ...prev, episode: +e.target.value }))
-          }
+          onChange={handleChange}
         />
         <Button
           type="submit"
