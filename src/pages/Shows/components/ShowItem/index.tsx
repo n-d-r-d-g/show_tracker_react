@@ -59,6 +59,7 @@ function ShowItem({ show }: Props) {
         alt={`${show.title} cover`}
         width="24px"
         height="24px"
+        className="rounded-sm h-full"
       />
       <Input
         name="title"

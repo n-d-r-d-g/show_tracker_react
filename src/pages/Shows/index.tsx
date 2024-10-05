@@ -112,6 +112,12 @@ const Shows = observer(function () {
         className="flex flex-row justify-center items-center gap-2 mt-6"
       >
         <Input
+          name="imgUrl"
+          placeholder={tShows('imgUrl')}
+          value={show.imgUrl}
+          onChange={handleChange}
+        />
+        <Input
           name="title"
           placeholder={tShows('title')}
           value={show.title}
@@ -131,6 +137,7 @@ const Shows = observer(function () {
           min={0}
           max={99}
           onChange={handleChange}
+          className="min-w-[4.5rem] max-w-[4.5rem]"
         />
         <Input
           name="episode"
@@ -140,6 +147,7 @@ const Shows = observer(function () {
           min={0}
           max={99}
           onChange={handleChange}
+          className="min-w-[4.5rem] max-w-[4.5rem]"
         />
         <Button
           type="submit"
