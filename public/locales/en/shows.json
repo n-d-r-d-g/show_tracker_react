@@ -9,6 +9,7 @@
   "watchNow": "Watch now",
   "unarchive": "Unarchive",
   "archive": "Archive",
+  "changeImgUrl": "Change poster",
   "deleteConfirmation": "Are you sure you want to delete {{show}}?",
   "deleteDescription": "This action cannot be undone. This show will be permanently removed from our servers."
 }

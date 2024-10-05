@@ -6,6 +6,7 @@
   "signOutEverywhere": "Sign out from everywhere",
   "cancel": "Cancel",
   "delete": "Delete",
+  "save": "Save",
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",
@@ -16,9 +17,14 @@
     "error": "Error!",
     "signIn": "We couldn't sign you in due to an unexpected error on our end. Please try again in a few minutes.",
     "signOut": "We couldn't sign you out due to an unexpected error on our end. Next time you sign out, please choose `Sign out everywhere` to make sure there's no unauthorized access to your account.",
+    "save": "An error occurred while saving your information. Please try again later.",
     "formContainsErrors": "Please fix all errors in the form.",
     "form": {
       "required": "Please fill in this field."
     }
+  },
+  "success": {
+    "successful": "Success!",
+    "save": "Your information was successfully saved."
   }
 }

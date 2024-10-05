@@ -1,11 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import axios from 'axios';
-import { FolderOutput, FolderSymlink, Play, Trash } from 'lucide-react';
-import { useCallback, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { DEBOUNCE_TIMEOUT_IN_MS } from '../../../../constants';
-import showStore, { IShow } from '../../../../store/show';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +9,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import axios, { AxiosError } from 'axios';
+import { FolderOutput, FolderSymlink, Play, Trash } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { DEBOUNCE_TIMEOUT_IN_MS } from '../../../../constants';
+import showStore, { IShow } from '../../../../store/show';
 
 interface Props {
   show: IShow;
@@ -25,6 +35,8 @@ interface Props {
 function ShowItem({ show }: Props) {
   const { t: tShows } = useTranslation('shows');
   const { t: tCommon } = useTranslation('common');
+  const { toast } = useToast();
+  const [isImgUrlDialogOpen, setIsImgUrlDialogOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
@@ -52,15 +64,80 @@ function ShowItem({ show }: Props) {
     showStore.deleteShow(show.id!);
   }, [show.id]);
 
+  const handleImgUrlSubmit = useCallback(
+    async (ev: FormEvent<HTMLFormElement>) => {
+      ev.preventDefault();
+
+      const imgUrl = (
+        ev.currentTarget.elements.namedItem('imgUrl') as HTMLInputElement
+      )?.value;
+      showStore.updateShowById(show.id!, { imgUrl });
+
+      try {
+        await axios.patch(
+          `${import.meta.env.VITE_APP_API_URL}shows/${show.id}`,
+          {
+            image: imgUrl,
+          }
+        );
+
+        setIsImgUrlDialogOpen(false);
+
+        toast({
+          variant: 'default',
+          title: tCommon('success.successful'),
+          description: tCommon('success.save'),
+        });
+      } catch (e) {
+        console.log(
+          'e :>> ',
+          `${(e as AxiosError).code} | ${(e as AxiosError).message}`
+        );
+
+        toast({
+          variant: 'destructive',
+          title: tCommon('errors.error'),
+          description: tCommon('errors.save'),
+        });
+      }
+    },
+    [show.id, tCommon, toast]
+  );
+
+  const openImgUrlDialog = useCallback(() => setIsImgUrlDialogOpen(true), []);
+
   return (
-    <div className="relative flex flex-row items-center gap-2">
-      <img
-        src={show.imgUrl ?? './logo192.png'}
-        alt={`${show.title} cover`}
-        width="24px"
-        height="24px"
-        className="rounded-sm h-full"
-      />
+    <div className="min-h-0 relative flex flex-row items-center gap-2">
+      <Dialog open={isImgUrlDialogOpen}>
+        <DialogTrigger onClick={openImgUrlDialog} asChild>
+          <Button
+            className="min-w-[24px] max-w-[24px] min-h-full p-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${show.imgUrl ?? './no-poster.jpg'})`,
+            }}
+            title={tShows('changeImgUrl')}
+            aria-label={tShows('changeImgUrl')}
+          ></Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleImgUrlSubmit}>
+            <DialogHeader>
+              <DialogTitle>{tShows('changeImgUrl')}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-2 py-4">
+              <Label htmlFor="imgUrl">{tShows('imgUrl')}</Label>
+              <Input
+                id="imgUrl"
+                placeholder={tShows('imgUrl')}
+                defaultValue={show.imgUrl ?? ''}
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit">{tCommon('save')}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       <Input
         name="title"
         defaultValue={show.title}
