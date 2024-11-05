@@ -6,6 +6,13 @@ This project has been created for users to store information, such as, season, e
 
 Currently, the API is not OSS but will be documented in the future.
 
+## Project setup
+
+1. Clone or fork this project.
+2. Install dependencies: `pnpm install`.
+3. Create a `.env` file and add all the environment variables from `.env.sample` with the corresponding values.
+4. Run the project locally: `pnpm dev`.
+
 ## Plugins
 
 Two official plugins are available:
